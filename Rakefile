@@ -7,15 +7,14 @@ require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/contrib/rubyforgepublisher'
 require 'rake/contrib/sshpublisher'
+require 'spec/rake/spectask'
 require 'fileutils'
 include FileUtils
 
 NAME              = "blackboard"
-AUTHOR            = "jsvd"
-EMAIL             = "jsvd@"
+AUTHOR            = "João Duarte"
+EMAIL             = "joao-d-duarte@telecom.pt"
 DESCRIPTION       = ""
-RUBYFORGE_PROJECT = "blackboard"
-HOMEPATH          = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
 BIN_FILES         = %w(  )
 VERS              = "0.0.1"
 
@@ -32,6 +31,8 @@ RDOC_OPTS = [
 
 task :default => [:test]
 task :package => [:clean]
+
+
 
 Rake::TestTask.new("test") do |t|
 	t.libs   << "test"
@@ -50,9 +51,7 @@ spec = Gem::Specification.new do |s|
 	s.description       = DESCRIPTION
 	s.author            = AUTHOR
 	s.email             = EMAIL
-	s.homepage          = HOMEPATH
 	s.executables       = BIN_FILES
-	s.rubyforge_project = RUBYFORGE_PROJECT
 	s.bindir            = "bin"
 	s.require_path      = "lib"
 	s.autorequire       = ""
@@ -62,7 +61,7 @@ spec = Gem::Specification.new do |s|
 	#s.required_ruby_version = '>= 1.8.2'
 
 	s.files = %w(README ChangeLog Rakefile) +
-		Dir.glob("{bin,doc,test,lib,templates,generator,extras,website,script}/**/*") + 
+		Dir.glob("{bin,doc,spec,test,lib,templates,generator,extras,website,script}/**/*") + 
 		Dir.glob("ext/**/*.{h,c,rb}") +
 		Dir.glob("examples/**/*.rb") +
 		Dir.glob("tools/*.rb")
@@ -100,32 +99,9 @@ Rake::RDocTask.new do |rdoc|
 	end
 end
 
-desc "Publish to RubyForge"
-task :rubyforge => [:rdoc, :package] do
-	require 'rubyforge'
-	Rake::RubyForgePublisher.new(RUBYFORGE_PROJECT, 'jsvd').upload
-end
-
-desc 'Package and upload the release to rubyforge.'
-task :release => [:clean, :package] do |t|
-	v = ENV["VERSION"] or abort "Must supply VERSION=x.y.z"
-	abort "Versions don't match #{v} vs #{VERS}" unless v == VERS
-	pkg = "pkg/#{NAME}-#{VERS}"
-
-	rf = RubyForge.new
-	puts "Logging in"
-	rf.login
-
-	c = rf.userconfig
-#	c["release_notes"] = description if description
-#	c["release_changes"] = changes if changes
-	c["preformatted"] = true
-
-	files = [
-		"#{pkg}.tgz",
-		"#{pkg}.gem"
-	].compact
-
-	puts "Releasing #{NAME} v. #{VERS}"
-	rf.add_release RUBYFORGE_PROJECT, NAME, VERS, *files
+desc "Run all examples with RCov"
+Spec::Rake::SpecTask.new('examples_with_rcov') do |t|
+  t.spec_files = FileList['spec/**/*.rb']
+  t.rcov = true
+  t.rcov_opts = ['--exclude', 'examples']
 end
