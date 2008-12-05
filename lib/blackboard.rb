@@ -17,6 +17,7 @@ module Pulso
 
     def initialize name, object
       @name = name
+      raise BlackBoardError, "Object does not have timestamp" unless object.respond_to?(:timestamp)
       @data = object
       @timestamp = Time.now
     end
@@ -36,6 +37,7 @@ module Pulso
     def initialize topic, opts = {}
       @topic = topic
       @folders = {}
+      @ttl = opts[:ttl] || 2
       servers = opts[:servers]
       servers ||= "127.0.0.1:11411"
 
@@ -50,7 +52,7 @@ module Pulso
       !@folders.empty?
     end
 
-    def empty?
+    def empty? #cycle servers
       @cache.stats.inject(0) {|sum, server| sum + server.last["curr_items"]} == 0
     end
 
@@ -63,31 +65,26 @@ module Pulso
       @folders.keys
     end
 
-    def add folder, object
-      id = "#{folder.to_s}#{object.name.to_s}".to_sym
-      @cache[id] = object
+    def add folder, tag, object
+      id = "#{folder.to_s}#{tag.to_s}".to_sym
+      @cache.add id, Pulso::Data.new(tag, object), @ttl
     end
 
     def get folder, obj_name
+      raise BlackBoardError, "Folder #{folder} not found" unless @folders.has_key?(folder)
       id = "#{folder.to_s}#{obj_name.to_s}".to_sym
-      @cache[id]
+      return unless @cache[id]
+      @cache[id].data
     end
 
-
-=begin
     def clean
       @cache.flush_all
     end
 
-    def write obj
-      @cache["#{obj.name}#{obj.arguments}"] = obj
-    end
+  end
 
-    def read method, arguments
-      @cache["#{method}#{arguments}"]
-    end
+  class BlackBoardError < RuntimeError
 
-=end
   end
 
 end
