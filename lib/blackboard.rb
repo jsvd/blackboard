@@ -2,10 +2,15 @@ module Pulso
 
   class Folder
 
-    attr_reader :name,:timestamp
+    attr_reader :name, :timestamp, :keys
 
-    def initialize name
+    def initialize name, keys
       @name = name
+      @keys = {}
+      keys.each do |key|
+        @keys["#{name.to_i}#{key.to_i}"] = key
+      end
+
       @timestamp = Time.at 0
     end
 
@@ -22,7 +27,6 @@ module Pulso
       @timestamp = Time.now
     end
 
-
   end
 
   class BlackBoard
@@ -32,10 +36,9 @@ module Pulso
 
     @cache = nil
 
-    attr_reader :topic
+    attr_reader :topic, :folders
 
-    def initialize topic, opts = {}
-      @topic = topic
+    def initialize opts = {}
       @folders = {}
       @ttl = opts[:ttl] || 2
       servers = opts[:servers]
@@ -56,25 +59,30 @@ module Pulso
       @cache.stats.inject(0) {|sum, server| sum + server.last["curr_items"]} == 0
     end
 
-    def add_folder name
-      folder = Pulso::Folder.new :folder1
+    def add_folder name, keys
+      folder = Pulso::Folder.new name, keys
       @folders[name] = folder
     end
 
-    def folders
-      @folders.keys
-    end
-
     def add folder, tag, object
-      id = "#{folder.to_s}#{tag.to_s}".to_sym
+      id = "#{folder.to_i}#{tag.to_i}"
       @cache.add id, Pulso::Data.new(tag, object), @ttl
     end
 
     def get folder, obj_name
       raise BlackBoardError, "Folder #{folder} not found" unless @folders.has_key?(folder)
-      id = "#{folder.to_s}#{obj_name.to_s}".to_sym
-      return unless @cache[id]
-      @cache[id].data
+        id = "#{folder.to_i}#{obj_name.to_i}"
+        return unless @cache[id]
+        @cache[id].data
+    end
+
+    def get_folder folder
+      ret = {}
+      folder = @folders[folder]
+      @cache.get_multi(*folder.keys.keys).each do |k,v|
+          ret.store folder.keys[k], v.data
+        end
+      ret
     end
 
     def clean
