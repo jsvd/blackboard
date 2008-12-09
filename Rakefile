@@ -20,6 +20,7 @@ BIN_FILES         = %w(  )
 VERS              = "0.0.1"
 MetricFu::CHURN_OPTIONS = {:scm => :git}
 #MetricFu::DIRECTORIES_TO_FLOG = ['lib']  
+MetricFu::SAIKURO_OPTIONS = {"--input_directory" => 'lib'}
 
 REV = File.read(".svn/entries")[/committed-rev="(d+)"/, 1] rescue nil
 CLEAN.include ['**/.*.sw?', '*.gem', '.config']
@@ -34,8 +35,6 @@ RDOC_OPTS = [
 
 task :default => [:test]
 task :package => [:clean]
-
-
 
 Rake::TestTask.new("test") do |t|
 	t.libs   << "test"
@@ -108,3 +107,5 @@ Spec::Rake::SpecTask.new('examples_with_rcov') do |t|
   t.rcov = true
   t.rcov_opts = ['--exclude', 'examples']
 end
+
+task :cruise => [ "metrics:flog", "metrics:churn", "metrics:coverage", "metrics:saikuro" ]
