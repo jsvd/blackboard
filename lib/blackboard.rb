@@ -59,10 +59,11 @@ module Pulso
       @ttl = opts[:ttl] || 2
       @servers = opts[:servers]
       @servers ||= "127.0.0.1:11411"
+      @cache = MemCache.new(@servers)
     end
 
     def active?
-     true #FIXME
+      @cache.active?
     end
 
     def has_folders?
@@ -70,7 +71,7 @@ module Pulso
     end
 
     def empty? 
-      MemCache.new(@servers).stats.inject(0) {|sum, server| sum + server.last["curr_items"]} == 0
+      @cache.stats.inject(0) {|sum, server| sum + server.last["curr_items"]} == 0
     end
 
     def add_folder name, keys
@@ -102,7 +103,7 @@ module Pulso
     end
 
     def clean
-      MemCache.new(@servers).flush_all
+      @cache.flush_all
     end
 
   end
