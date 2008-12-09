@@ -82,14 +82,24 @@ describe Pulso::BlackBoard do
 
   describe "(non-empty)" do
     
-    it "should not be empty" do 
-
+    before :all do
       @blackboard.add_folder :folder1, [:name1, :name2, :name3]
-      @blackboard.should have_folders
+    end
 
-      obj = TestObject.new
-      obj.color = :blue
-      @blackboard.add :folder1, :name1, obj
+    before :each do
+      @obj = TestObject.new
+      @obj.color = :green
+      @blackboard.add :folder1, :name2, @obj
+      @obj = TestObject.new
+      @obj.color = :black
+      @blackboard.add :folder1, :name3, @obj
+      @obj = TestObject.new
+      @obj.color = :blue
+      @blackboard.add :folder1, :name1, @obj
+    end
+
+    it "should not be empty" do 
+      @blackboard.should have_folders
       @blackboard.should_not be_empty
     end
 
@@ -98,9 +108,6 @@ describe Pulso::BlackBoard do
     end
 
     it "should be able to retrieve object from a folder" do
-      obj = TestObject.new
-      obj.color = :blue
-      @blackboard.add :folder1, :name1, obj
       obj = @blackboard.get :folder1, :name1
       obj.color.should == :blue
     end
@@ -111,34 +118,19 @@ describe Pulso::BlackBoard do
     end
 
     it "should not return nil when retrieving object whose time-to-live was not exceeded" do 
-      obj = TestObject.new
-      obj.color = :blue
-      @blackboard.add :folder1, :name1, obj
       `sleep 1`
       @blackboard.get(:folder1, :name1).should_not be_nil
     end
 
     it "should return nil when retrieving object whose time-to-live was exceeded" do 
-      obj = TestObject.new
-      obj.color = :blue
-      @blackboard.add :folder1, :name1, obj
       @blackboard.get(:folder1, :name1).should_not be_nil
       `sleep 2`
       @blackboard.get(:folder1, :name1).should be_nil
-      @blackboard.add :folder1, :name1, obj
+      @blackboard.add :folder1, :name1, @obj # already expired
       @blackboard.get(:folder1, :name1).should be_nil
     end
 
     it "should be possible to retrieve all data from a folder" do
-      obj = TestObject.new
-      obj.color = :blue
-      @blackboard.add :folder1, :name1, obj
-      obj = TestObject.new
-      obj.color = :green
-      @blackboard.add :folder1, :name2, obj
-      obj = TestObject.new
-      obj.color = :black
-      @blackboard.add :folder1, :name3, obj
       ret = @blackboard.get_folder :folder1
       ret[:name1].color.should == :blue
       ret[:name2].color.should == :green
@@ -150,6 +142,10 @@ describe Pulso::BlackBoard do
       obj.color = :blue
       @blackboard.add :folder1, :name1, obj
       @blackboard.timestamp(:folder1, :name1).should be_close Time.now, 0.2
+    end
+
+    after :each do
+      @blackboard.clean
     end
   end
 
