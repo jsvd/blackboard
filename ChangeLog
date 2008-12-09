@@ -1,9 +1,13 @@
-== 0.0.1 / 2008-11-28
+== 0.1.1 / 2008-12-09
 
-* initial release
+* Improved get method error handling
 
 == 0.1.0 / 2008-12-09
 
 * Added expiration times
 * Added folders and data objects
 * Added one memcache instance per folder
+
+== 0.0.1 / 2008-11-28
+
+* initial release

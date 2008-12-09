@@ -74,8 +74,12 @@ describe Pulso::BlackBoard do
       lambda { @blackboard.get :folder2, :name1 }.should raise_error Pulso::BlackBoardError
     end
 
-    it "should return nil when retrieving from empty folder" do
+    it "should return nil when retrieving known data key from folder" do
       @blackboard.get(:folder1, :name2).should be_nil
+    end
+
+    it "should complain when retrieving unknown data key from folder" do
+      lambda { @blackboard.get(:folder1, :name5) }.should raise_error Pulso::BlackBoardError
     end
 
   end

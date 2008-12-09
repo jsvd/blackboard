@@ -8,7 +8,7 @@ module Pulso
       @name = name
       @keys = {}
       keys.each do |key|
-        @keys[name] = nil # timestamp
+        @keys[key] = nil # timestamp
       end
 
       @cache = MemCache.new servers, :namespace => name
@@ -20,6 +20,7 @@ module Pulso
     end
     
     def get obj_name
+      raise BlackBoardError, "Key #{obj_name} doesn't exist in folder #{@name}." unless @keys.has_key?(obj_name)
       ret = @cache[obj_name]
       return if ret.nil?
       ret.data
