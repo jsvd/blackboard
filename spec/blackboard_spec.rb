@@ -1,3 +1,4 @@
+require 'spec'
 require 'lib/blackboard'
 
 class TestObject
@@ -22,14 +23,6 @@ describe Pulso::Folder do
   it "should have a timestamp" do
     Pulso::Folder.new(:folder1, []).timestamp.should == Time.at(0)
   end
-
-=begin
-  it "should list all data keys" do
-    folder = Pulso::Folder.new(:folder1, [:name1, :name2])
-    folder.keys.should include(:name1)
-    folder.keys.should include(:name2)
-  end
-=end
 
 end
 

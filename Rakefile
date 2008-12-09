@@ -9,6 +9,7 @@ require 'rake/contrib/rubyforgepublisher'
 require 'rake/contrib/sshpublisher'
 require 'spec/rake/spectask'
 require 'fileutils'
+require 'metric_fu'
 include FileUtils
 
 NAME              = "blackboard"
@@ -17,6 +18,8 @@ EMAIL             = "joao-d-duarte@telecom.pt"
 DESCRIPTION       = ""
 BIN_FILES         = %w(  )
 VERS              = "0.0.1"
+MetricFu::CHURN_OPTIONS = {:scm => :git}
+#MetricFu::DIRECTORIES_TO_FLOG = ['lib']  
 
 REV = File.read(".svn/entries")[/committed-rev="(d+)"/, 1] rescue nil
 CLEAN.include ['**/.*.sw?', '*.gem', '.config']
