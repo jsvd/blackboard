@@ -2,3 +2,8 @@
 
 * initial release
 
+== 0.1.0 / 2008-12-09
+
+* Added expiration times
+* Added folders and data objects
+* Added one memcache instance per folder

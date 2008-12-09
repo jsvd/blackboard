@@ -17,7 +17,7 @@ AUTHOR            = "João Duarte"
 EMAIL             = "joao-d-duarte@telecom.pt"
 DESCRIPTION       = ""
 BIN_FILES         = %w(  )
-VERS              = "0.0.1"
+VERS              = "0.1.0"
 MetricFu::CHURN_OPTIONS = {:scm => :git}
 #MetricFu::DIRECTORIES_TO_FLOG = ['lib']  
 MetricFu::SAIKURO_OPTIONS = {"--input_directory" => 'lib'}
@@ -59,8 +59,8 @@ spec = Gem::Specification.new do |s|
 	s.autorequire       = ""
 	s.test_files        = Dir["test/test_*.rb"]
 
-	#s.add_dependency('activesupport', '>=1.3.1')
-	#s.required_ruby_version = '>= 1.8.2'
+	s.add_dependency('memcache-client', '>=1.5.0')
+	s.required_ruby_version = '>= 1.8.5'
 
 	s.files = %w(README ChangeLog Rakefile) +
 		Dir.glob("{bin,doc,spec,test,lib,templates,generator,extras,website,script}/**/*") + 
