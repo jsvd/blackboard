@@ -156,7 +156,7 @@
       C0 code coverage information
     </h3>
     <p>
-      Generated on Fri Dec 05 16:32:23 +0000 2008 with 
+      Generated on Tue Dec 09 15:28:21 +0000 2008 with 
       <a href='http://eigenclass.org/hiki/rcov'>
         rcov 0.8.1.2
       </a>
@@ -174,7 +174,7 @@
     <td class='heading'> Total coverage </td> <td class='heading'> Code coverage
     </td> </tr> </thead> <tbody> <tr class='light'> <td> <a
     href='spec-blackboard_spec_rb.html'> spec/blackboard_spec.rb </a> </td> <td
-    class='lines_total'> <tt> 153 </tt> </td> <td class='lines_code'> <tt> 110
+    class='lines_total'> <tt> 161 </tt> </td> <td class='lines_code'> <tt> 125
     </tt> </td> <td> <table cellspacing='0' align='right' cellpadding='0'> <tr>
     <td> <tt class='coverage_total'> 100.0% </tt> &nbsp; </td> <td> <table
     class='percent_graph' cellspacing='0' cellpadding='0' width='100'> <tr> <td
@@ -185,178 +185,189 @@
     cellpadding='0' width='100'> <tr> <td class='covered' width='100' /> <td
     class='uncovered' width='0' /> </tr> </table> </td> </tr> </table> </td>
     </tr> </tbody> </table><pre><span class="marked1"><a name="line1"></a> 1
-    require 'lib/blackboard' </span><span class="inferred0"><a name="line2"></a>
-    2 </span><span class="marked1"><a name="line3"></a> 3 class TestObject
-    </span><span class="inferred0"><a name="line4"></a> 4 </span><span
-    class="marked1"><a name="line5"></a> 5 def initialize </span><span
-    class="marked0"><a name="line6"></a> 6 @timestamp = Time.now </span><span
-    class="inferred1"><a name="line7"></a> 7 end </span><span
-    class="inferred0"><a name="line8"></a> 8 </span><span class="marked1"><a
-    name="line9"></a> 9 attr_accessor :color </span><span class="marked0"><a
-    name="line10"></a> 10 attr_reader :timestamp </span><span
-    class="inferred1"><a name="line11"></a> 11 end </span><span
-    class="inferred0"><a name="line12"></a> 12 </span><span class="marked1"><a
-    name="line13"></a> 13 describe Pulso::Folder do </span><span
-    class="inferred0"><a name="line14"></a> 14 </span><span class="marked1"><a
-    name="line15"></a> 15 it &quot;should be created with a name&quot; do
-    </span><span class="marked0"><a name="line16"></a> 16 f = nil </span><span
-    class="marked1"><a name="line17"></a> 17 lambda { f = Pulso::Folder.new
-    }.should raise_error </span><span class="marked0"><a name="line18"></a> 18
+    require 'spec' </span><span class="marked0"><a name="line2"></a> 2 require
+    'lib/blackboard' </span><span class="inferred1"><a name="line3"></a> 3
+    </span><span class="marked0"><a name="line4"></a> 4 class TestObject
+    </span><span class="inferred1"><a name="line5"></a> 5 </span><span
+    class="marked0"><a name="line6"></a> 6 def initialize </span><span
+    class="marked1"><a name="line7"></a> 7 @timestamp = Time.now </span><span
+    class="inferred0"><a name="line8"></a> 8 end </span><span
+    class="inferred1"><a name="line9"></a> 9 </span><span class="marked0"><a
+    name="line10"></a> 10 attr_accessor :color </span><span class="marked1"><a
+    name="line11"></a> 11 attr_reader :timestamp </span><span
+    class="inferred0"><a name="line12"></a> 12 end </span><span
+    class="inferred1"><a name="line13"></a> 13 </span><span class="marked0"><a
+    name="line14"></a> 14 describe Pulso::Folder do </span><span
+    class="inferred1"><a name="line15"></a> 15 </span><span class="marked0"><a
+    name="line16"></a> 16 it &quot;should be created with a name&quot; do
+    </span><span class="marked1"><a name="line17"></a> 17 f = nil </span><span
+    class="marked0"><a name="line18"></a> 18 lambda { f = Pulso::Folder.new
+    }.should raise_error </span><span class="marked1"><a name="line19"></a> 19
     lambda { f = Pulso::Folder.new :folder1, [] }.should_not raise_error
-    </span><span class="marked1"><a name="line19"></a> 19 f.name.should ==
-    :folder1 </span><span class="inferred0"><a name="line20"></a> 20 end
-    </span><span class="inferred1"><a name="line21"></a> 21 </span><span
-    class="marked0"><a name="line22"></a> 22 it &quot;should have a
-    timestamp&quot; do </span><span class="marked1"><a name="line23"></a> 23
+    </span><span class="marked0"><a name="line20"></a> 20 f.name.should ==
+    :folder1 </span><span class="inferred1"><a name="line21"></a> 21 end
+    </span><span class="inferred0"><a name="line22"></a> 22 </span><span
+    class="marked1"><a name="line23"></a> 23 it &quot;should have a
+    timestamp&quot; do </span><span class="marked0"><a name="line24"></a> 24
     Pulso::Folder.new(:folder1, []).timestamp.should == Time.at(0) </span><span
-    class="inferred0"><a name="line24"></a> 24 end </span><span
-    class="inferred1"><a name="line25"></a> 25 </span><span class="inferred0"><a
-    name="line26"></a> 26 =begin </span><span class="inferred1"><a
-    name="line27"></a> 27 it &quot;should list all data keys&quot; do
-    </span><span class="inferred0"><a name="line28"></a> 28 folder =
-    Pulso::Folder.new(:folder1, [:name1, :name2]) </span><span
-    class="inferred1"><a name="line29"></a> 29 folder.keys.should
-    include(:name1) </span><span class="inferred0"><a name="line30"></a> 30
-    folder.keys.should include(:name2) </span><span class="inferred1"><a
-    name="line31"></a> 31 end </span><span class="inferred0"><a
-    name="line32"></a> 32 =end </span><span class="inferred1"><a
-    name="line33"></a> 33 </span><span class="inferred0"><a name="line34"></a>
-    34 end </span><span class="inferred1"><a name="line35"></a> 35 </span><span
-    class="marked0"><a name="line36"></a> 36 describe Pulso::Data do
-    </span><span class="inferred1"><a name="line37"></a> 37 </span><span
-    class="marked0"><a name="line38"></a> 38 it &quot;should be initialized with
-    a name and an object that responds to :timestamp&quot; do </span><span
-    class="marked1"><a name="line39"></a> 39 lambda { Pulso::Data.new }.should
-    raise_error </span><span class="marked0"><a name="line40"></a> 40 lambda {
-    Pulso::Data.new :name1, Object.new }.should raise_error
-    Pulso::BlackBoardError </span><span class="marked1"><a name="line41"></a> 41
-    obj = TestObject.new </span><span class="marked0"><a name="line42"></a> 42
-    data = nil </span><span class="marked1"><a name="line43"></a> 43 lambda {
-    data = Pulso::Data.new :name1, obj }.should_not raise_error
-    Pulso::BlackBoardError </span><span class="marked0"><a name="line44"></a> 44
-    data.name.should == :name1 </span><span class="marked1"><a
-    name="line45"></a> 45 data.data.should == obj </span><span
-    class="inferred0"><a name="line46"></a> 46 end </span><span
-    class="inferred1"><a name="line47"></a> 47 </span><span class="marked0"><a
-    name="line48"></a> 48 it &quot;should have a timestamp&quot; do </span><span
-    class="marked1"><a name="line49"></a> 49 Pulso::Data.new(:name1,
+    class="inferred1"><a name="line25"></a> 25 end </span><span
+    class="inferred0"><a name="line26"></a> 26 </span><span class="inferred1"><a
+    name="line27"></a> 27 end </span><span class="inferred0"><a
+    name="line28"></a> 28 </span><span class="marked1"><a name="line29"></a> 29
+    describe Pulso::Data do </span><span class="inferred0"><a name="line30"></a>
+    30 </span><span class="marked1"><a name="line31"></a> 31 it &quot;should be
+    initialized with a name and an object that responds to :timestamp&quot; do
+    </span><span class="marked0"><a name="line32"></a> 32 lambda {
+    Pulso::Data.new }.should raise_error </span><span class="marked1"><a
+    name="line33"></a> 33 lambda { Pulso::Data.new :name1, Object.new }.should
+    raise_error Pulso::BlackBoardError </span><span class="marked0"><a
+    name="line34"></a> 34 obj = TestObject.new </span><span class="marked1"><a
+    name="line35"></a> 35 data = nil </span><span class="marked0"><a
+    name="line36"></a> 36 lambda { data = Pulso::Data.new :name1, obj
+    }.should_not raise_error Pulso::BlackBoardError </span><span
+    class="marked1"><a name="line37"></a> 37 data.name.should == :name1
+    </span><span class="marked0"><a name="line38"></a> 38 data.data.should ==
+    obj </span><span class="inferred1"><a name="line39"></a> 39 end </span><span
+    class="inferred0"><a name="line40"></a> 40 </span><span class="marked1"><a
+    name="line41"></a> 41 it &quot;should have a timestamp&quot; do </span><span
+    class="marked0"><a name="line42"></a> 42 Pulso::Data.new(:name1,
     TestObject.new).timestamp.should be_close Time.now,1 </span><span
-    class="inferred0"><a name="line50"></a> 50 end </span><span
-    class="inferred1"><a name="line51"></a> 51 </span><span class="inferred0"><a
-    name="line52"></a> 52 end </span><span class="inferred1"><a
-    name="line53"></a> 53 </span><span class="marked0"><a name="line54"></a> 54
-    describe Pulso::BlackBoard do </span><span class="inferred1"><a
-    name="line55"></a> 55 </span><span class="marked0"><a name="line56"></a> 56
-    before :all do </span><span class="marked1"><a name="line57"></a> 57
+    class="inferred1"><a name="line43"></a> 43 end </span><span
+    class="inferred0"><a name="line44"></a> 44 </span><span class="inferred1"><a
+    name="line45"></a> 45 end </span><span class="inferred0"><a
+    name="line46"></a> 46 </span><span class="marked1"><a name="line47"></a> 47
+    describe Pulso::BlackBoard do </span><span class="inferred0"><a
+    name="line48"></a> 48 </span><span class="marked1"><a name="line49"></a> 49
+    before :all do </span><span class="marked0"><a name="line50"></a> 50
     `memcached -d -p 11411 -P /tmp/memcached-test.pid` </span><span
-    class="marked0"><a name="line58"></a> 58 @blackboard = Pulso::BlackBoard.new
-    </span><span class="inferred1"><a name="line59"></a> 59 end </span><span
-    class="inferred0"><a name="line60"></a> 60 </span><span class="marked1"><a
-    name="line61"></a> 61 describe &quot;(default)&quot; do </span><span
-    class="inferred0"><a name="line62"></a> 62 </span><span class="marked1"><a
-    name="line63"></a> 63 it &quot;should be active?&quot; do </span><span
-    class="marked0"><a name="line64"></a> 64 @blackboard.should be_active
-    </span><span class="inferred1"><a name="line65"></a> 65 end </span><span
-    class="inferred0"><a name="line66"></a> 66 </span><span class="marked1"><a
-    name="line67"></a> 67 it &quot;should not have folders&quot; do </span><span
-    class="marked0"><a name="line68"></a> 68 @blackboard.should_not have_folders
-    </span><span class="inferred1"><a name="line69"></a> 69 end </span><span
-    class="inferred0"><a name="line70"></a> 70 </span><span class="inferred1"><a
-    name="line71"></a> 71 end </span><span class="inferred0"><a
-    name="line72"></a> 72 </span><span class="marked1"><a name="line73"></a> 73
-    describe &quot;(empty)&quot; do </span><span class="inferred0"><a
-    name="line74"></a> 74 </span><span class="marked1"><a name="line75"></a> 75
-    it { @blackboard.should be_empty } </span><span class="inferred0"><a
-    name="line76"></a> 76 </span><span class="marked1"><a name="line77"></a> 77
+    class="marked1"><a name="line51"></a> 51 @blackboard = Pulso::BlackBoard.new
+    </span><span class="inferred0"><a name="line52"></a> 52 end </span><span
+    class="inferred1"><a name="line53"></a> 53 </span><span class="marked0"><a
+    name="line54"></a> 54 describe &quot;(default)&quot; do </span><span
+    class="inferred1"><a name="line55"></a> 55 </span><span class="marked0"><a
+    name="line56"></a> 56 it &quot;should be active?&quot; do </span><span
+    class="marked1"><a name="line57"></a> 57 @blackboard.should be_active
+    </span><span class="inferred0"><a name="line58"></a> 58 end </span><span
+    class="inferred1"><a name="line59"></a> 59 </span><span class="marked0"><a
+    name="line60"></a> 60 it &quot;should not have folders&quot; do </span><span
+    class="marked1"><a name="line61"></a> 61 @blackboard.should_not have_folders
+    </span><span class="inferred0"><a name="line62"></a> 62 end </span><span
+    class="inferred1"><a name="line63"></a> 63 </span><span class="inferred0"><a
+    name="line64"></a> 64 end </span><span class="inferred1"><a
+    name="line65"></a> 65 </span><span class="marked0"><a name="line66"></a> 66
+    describe &quot;(empty)&quot; do </span><span class="inferred1"><a
+    name="line67"></a> 67 </span><span class="marked0"><a name="line68"></a> 68
+    it { @blackboard.should be_empty } </span><span class="inferred1"><a
+    name="line69"></a> 69 </span><span class="marked0"><a name="line70"></a> 70
     it &quot;should have folders after adding one&quot; do </span><span
-    class="marked0"><a name="line78"></a> 78 @blackboard.add_folder :folder1,
-    [:name1, :name2, :name3] </span><span class="marked1"><a name="line79"></a>
-    79 @blackboard.should have_folders </span><span class="marked0"><a
-    name="line80"></a> 80 @blackboard.folders.keys.should include(:folder1)
-    </span><span class="inferred1"><a name="line81"></a> 81 end </span><span
-    class="inferred0"><a name="line82"></a> 82 </span><span class="inferred1"><a
-    name="line83"></a> 83 # TODO improve by regexp matching </span><span
-    class="marked0"><a name="line84"></a> 84 it &quot;should complain when
-    retrieving from inexistant folder&quot; do </span><span class="marked1"><a
-    name="line85"></a> 85 lambda { @blackboard.get :folder2, :name1 }.should
-    raise_error Pulso::BlackBoardError </span><span class="inferred0"><a
-    name="line86"></a> 86 end </span><span class="inferred1"><a
-    name="line87"></a> 87 </span><span class="marked0"><a name="line88"></a> 88
+    class="marked1"><a name="line71"></a> 71 @blackboard.add_folder :folder1,
+    [:name1, :name2, :name3] </span><span class="marked0"><a name="line72"></a>
+    72 @blackboard.should have_folders </span><span class="marked1"><a
+    name="line73"></a> 73 @blackboard.folders.keys.should include(:folder1)
+    </span><span class="inferred0"><a name="line74"></a> 74 end </span><span
+    class="inferred1"><a name="line75"></a> 75 </span><span class="inferred0"><a
+    name="line76"></a> 76 # TODO improve by regexp matching </span><span
+    class="marked1"><a name="line77"></a> 77 it &quot;should complain when
+    retrieving from inexistant folder&quot; do </span><span class="marked0"><a
+    name="line78"></a> 78 lambda { @blackboard.get :folder2, :name1 }.should
+    raise_error Pulso::BlackBoardError </span><span class="inferred1"><a
+    name="line79"></a> 79 end </span><span class="inferred0"><a
+    name="line80"></a> 80 </span><span class="marked1"><a name="line81"></a> 81
     it &quot;should return nil when retrieving from empty folder&quot; do
-    </span><span class="marked1"><a name="line89"></a> 89
+    </span><span class="marked0"><a name="line82"></a> 82
     @blackboard.get(:folder1, :name2).should be_nil </span><span
-    class="inferred0"><a name="line90"></a> 90 end </span><span
-    class="inferred1"><a name="line91"></a> 91 </span><span class="inferred0"><a
-    name="line92"></a> 92 end </span><span class="inferred1"><a
-    name="line93"></a> 93 </span><span class="marked0"><a name="line94"></a> 94
-    describe &quot;(non-empty)&quot; do </span><span class="inferred1"><a
-    name="line95"></a> 95 </span><span class="marked0"><a name="line96"></a> 96
-    it &quot;should not be empty&quot; do </span><span class="inferred1"><a
-    name="line97"></a> 97 </span><span class="marked0"><a name="line98"></a> 98
+    class="inferred1"><a name="line83"></a> 83 end </span><span
+    class="inferred0"><a name="line84"></a> 84 </span><span class="inferred1"><a
+    name="line85"></a> 85 end </span><span class="inferred0"><a
+    name="line86"></a> 86 </span><span class="marked1"><a name="line87"></a> 87
+    describe &quot;(non-empty)&quot; do </span><span class="inferred0"><a
+    name="line88"></a> 88 </span><span class="marked1"><a name="line89"></a> 89
+    it &quot;should not be empty&quot; do </span><span class="inferred0"><a
+    name="line90"></a> 90 </span><span class="marked1"><a name="line91"></a> 91
     @blackboard.add_folder :folder1, [:name1, :name2, :name3] </span><span
-    class="marked1"><a name="line99"></a> 99 @blackboard.should have_folders
-    </span><span class="inferred0"><a name="line100"></a>100 </span><span
-    class="marked1"><a name="line101"></a>101 obj = TestObject.new </span><span
-    class="marked0"><a name="line102"></a>102 obj.color = :blue </span><span
-    class="marked1"><a name="line103"></a>103 @blackboard.add :folder1, :name1,
-    obj </span><span class="marked0"><a name="line104"></a>104
-    @blackboard.should_not be_empty </span><span class="inferred1"><a
-    name="line105"></a>105 end </span><span class="inferred0"><a
-    name="line106"></a>106 </span><span class="marked1"><a
-    name="line107"></a>107 it &quot;should be able to retrieve object from a
-    folder&quot; do </span><span class="marked0"><a name="line108"></a>108 obj =
-    TestObject.new </span><span class="marked1"><a name="line109"></a>109
-    obj.color = :blue </span><span class="marked0"><a name="line110"></a>110
-    @blackboard.add :folder1, :name1, obj </span><span class="marked1"><a
-    name="line111"></a>111 obj = @blackboard.get :folder1, :name1 </span><span
-    class="marked0"><a name="line112"></a>112 obj.color.should == :blue
-    </span><span class="inferred1"><a name="line113"></a>113 end </span><span
-    class="inferred0"><a name="line114"></a>114 </span><span class="marked1"><a
-    name="line115"></a>115 it &quot;should be empty after cleaning&quot; do
-    </span><span class="marked0"><a name="line116"></a>116 @blackboard.clean
-    </span><span class="marked1"><a name="line117"></a>117 @blackboard.should
-    be_empty </span><span class="inferred0"><a name="line118"></a>118 end
-    </span><span class="inferred1"><a name="line119"></a>119 </span><span
-    class="marked0"><a name="line120"></a>120 it &quot;should be empty after
-    single object exceeds time-to-live&quot; do </span><span class="marked1"><a
-    name="line121"></a>121 obj = TestObject.new </span><span class="marked0"><a
-    name="line122"></a>122 obj.color = :blue </span><span class="marked1"><a
-    name="line123"></a>123 @blackboard.add_folder :folder1, [:name1, :name2,
-    :name3] </span><span class="marked0"><a name="line124"></a>124
-    @blackboard.add :folder1, :name1, obj </span><span class="marked1"><a
-    name="line125"></a>125 `sleep 1` </span><span class="marked0"><a
-    name="line126"></a>126 @blackboard.get(:folder1, :name1).should_not be_nil
-    </span><span class="marked1"><a name="line127"></a>127 `sleep 2`
-    </span><span class="marked0"><a name="line128"></a>128
+    class="marked0"><a name="line92"></a> 92 @blackboard.should have_folders
+    </span><span class="inferred1"><a name="line93"></a> 93 </span><span
+    class="marked0"><a name="line94"></a> 94 obj = TestObject.new </span><span
+    class="marked1"><a name="line95"></a> 95 obj.color = :blue </span><span
+    class="marked0"><a name="line96"></a> 96 @blackboard.add :folder1, :name1,
+    obj </span><span class="marked1"><a name="line97"></a> 97
+    @blackboard.should_not be_empty </span><span class="inferred0"><a
+    name="line98"></a> 98 end </span><span class="inferred1"><a
+    name="line99"></a> 99 </span><span class="marked0"><a name="line100"></a>100
+    it &quot;should be able to retrieve object from a folder&quot; do
+    </span><span class="marked1"><a name="line101"></a>101 obj = TestObject.new
+    </span><span class="marked0"><a name="line102"></a>102 obj.color = :blue
+    </span><span class="marked1"><a name="line103"></a>103 @blackboard.add
+    :folder1, :name1, obj </span><span class="marked0"><a name="line104"></a>104
+    obj = @blackboard.get :folder1, :name1 </span><span class="marked1"><a
+    name="line105"></a>105 obj.color.should == :blue </span><span
+    class="inferred0"><a name="line106"></a>106 end </span><span
+    class="inferred1"><a name="line107"></a>107 </span><span class="marked0"><a
+    name="line108"></a>108 it &quot;should be empty after cleaning&quot; do
+    </span><span class="marked1"><a name="line109"></a>109 @blackboard.clean
+    </span><span class="marked0"><a name="line110"></a>110 @blackboard.should
+    be_empty </span><span class="inferred1"><a name="line111"></a>111 end
+    </span><span class="inferred0"><a name="line112"></a>112 </span><span
+    class="marked1"><a name="line113"></a>113 it &quot;should not return nil
+    when retrieving object whose time-to-live was not exceeded&quot; do
+    </span><span class="marked0"><a name="line114"></a>114 obj = TestObject.new
+    </span><span class="marked1"><a name="line115"></a>115 obj.color = :blue
+    </span><span class="marked0"><a name="line116"></a>116 @blackboard.add
+    :folder1, :name1, obj </span><span class="marked1"><a name="line117"></a>117
+    `sleep 1` </span><span class="marked0"><a name="line118"></a>118
+    @blackboard.get(:folder1, :name1).should_not be_nil </span><span
+    class="inferred1"><a name="line119"></a>119 end </span><span
+    class="inferred0"><a name="line120"></a>120 </span><span class="marked1"><a
+    name="line121"></a>121 it &quot;should return nil when retrieving object
+    whose time-to-live was exceeded&quot; do </span><span class="marked0"><a
+    name="line122"></a>122 obj = TestObject.new </span><span class="marked1"><a
+    name="line123"></a>123 obj.color = :blue </span><span class="marked0"><a
+    name="line124"></a>124 @blackboard.add :folder1, :name1, obj </span><span
+    class="marked1"><a name="line125"></a>125 @blackboard.get(:folder1,
+    :name1).should_not be_nil </span><span class="marked0"><a
+    name="line126"></a>126 `sleep 2` </span><span class="marked1"><a
+    name="line127"></a>127 @blackboard.get(:folder1, :name1).should be_nil
+    </span><span class="marked0"><a name="line128"></a>128 @blackboard.add
+    :folder1, :name1, obj </span><span class="marked1"><a name="line129"></a>129
     @blackboard.get(:folder1, :name1).should be_nil </span><span
-    class="inferred1"><a name="line129"></a>129 end </span><span
-    class="inferred0"><a name="line130"></a>130 </span><span class="marked1"><a
-    name="line131"></a>131 it &quot;should be able to retrieve all data from a
-    folder&quot; do </span><span class="marked0"><a name="line132"></a>132 obj =
-    TestObject.new </span><span class="marked1"><a name="line133"></a>133
-    obj.color = :blue </span><span class="marked0"><a name="line134"></a>134
+    class="inferred0"><a name="line130"></a>130 end </span><span
+    class="inferred1"><a name="line131"></a>131 </span><span class="marked0"><a
+    name="line132"></a>132 it &quot;should be possible to retrieve all data from
+    a folder&quot; do </span><span class="marked1"><a name="line133"></a>133 obj
+    = TestObject.new </span><span class="marked0"><a name="line134"></a>134
+    obj.color = :blue </span><span class="marked1"><a name="line135"></a>135
+    @blackboard.add :folder1, :name1, obj </span><span class="marked0"><a
+    name="line136"></a>136 obj = TestObject.new </span><span class="marked1"><a
+    name="line137"></a>137 obj.color = :green </span><span class="marked0"><a
+    name="line138"></a>138 @blackboard.add :folder1, :name2, obj </span><span
+    class="marked1"><a name="line139"></a>139 obj = TestObject.new </span><span
+    class="marked0"><a name="line140"></a>140 obj.color = :black </span><span
+    class="marked1"><a name="line141"></a>141 @blackboard.add :folder1, :name3,
+    obj </span><span class="marked0"><a name="line142"></a>142 ret =
+    @blackboard.get_folder :folder1 </span><span class="marked1"><a
+    name="line143"></a>143 ret[:name1].color.should == :blue </span><span
+    class="marked0"><a name="line144"></a>144 ret[:name2].color.should == :green
+    </span><span class="marked1"><a name="line145"></a>145
+    ret[:name3].color.should == :black </span><span class="inferred0"><a
+    name="line146"></a>146 end </span><span class="inferred1"><a
+    name="line147"></a>147 </span><span class="marked0"><a
+    name="line148"></a>148 it &quot;should timestamp the BlackBoard::Data object
+    with current time when adding&quot; do </span><span class="marked1"><a
+    name="line149"></a>149 obj = TestObject.new </span><span class="marked0"><a
+    name="line150"></a>150 obj.color = :blue </span><span class="marked1"><a
+    name="line151"></a>151 @blackboard.add_folder :folder1, [:name1, :name2,
+    :name3] </span><span class="marked0"><a name="line152"></a>152
     @blackboard.add :folder1, :name1, obj </span><span class="marked1"><a
-    name="line135"></a>135 obj = TestObject.new </span><span class="marked0"><a
-    name="line136"></a>136 obj.color = :green </span><span class="marked1"><a
-    name="line137"></a>137 @blackboard.add :folder1, :name2, obj </span><span
-    class="marked0"><a name="line138"></a>138 obj = TestObject.new </span><span
-    class="marked1"><a name="line139"></a>139 obj.color = :black </span><span
-    class="marked0"><a name="line140"></a>140 @blackboard.add :folder1, :name3,
-    obj </span><span class="marked1"><a name="line141"></a>141 ret =
-    @blackboard.get_folder :folder1 </span><span class="marked0"><a
-    name="line142"></a>142 ret[:name1].color.should == :blue </span><span
-    class="marked1"><a name="line143"></a>143 ret[:name2].color.should == :green
-    </span><span class="marked0"><a name="line144"></a>144
-    ret[:name3].color.should == :black </span><span class="inferred1"><a
-    name="line145"></a>145 end </span><span class="inferred0"><a
-    name="line146"></a>146 </span><span class="inferred1"><a
-    name="line147"></a>147 end </span><span class="inferred0"><a
-    name="line148"></a>148 </span><span class="marked1"><a
-    name="line149"></a>149 after :all do </span><span class="marked0"><a
-    name="line150"></a>150 `killall memcached` </span><span class="inferred1"><a
-    name="line151"></a>151 end </span><span class="inferred0"><a
-    name="line152"></a>152 </span><span class="inferred1"><a
-    name="line153"></a>153 end </span></pre>
+    name="line153"></a>153 @blackboard.timestamp(:folder1, :name1).should
+    be_close Time.now, 0.2 </span><span class="inferred0"><a
+    name="line154"></a>154 end </span><span class="inferred1"><a
+    name="line155"></a>155 end </span><span class="inferred0"><a
+    name="line156"></a>156 </span><span class="marked1"><a
+    name="line157"></a>157 after :all do </span><span class="marked0"><a
+    name="line158"></a>158 `killall memcached` </span><span class="inferred1"><a
+    name="line159"></a>159 end </span><span class="inferred0"><a
+    name="line160"></a>160 </span><span class="inferred1"><a
+    name="line161"></a>161 end </span></pre>
     <hr />
     <p> Generated using the <a href='http://eigenclass.org/hiki.rb?rcov'> rcov
     code coverage analysis tool for Ruby </a> version 0.8.1.2. </p>

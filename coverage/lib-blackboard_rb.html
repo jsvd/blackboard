@@ -156,7 +156,7 @@
       C0 code coverage information
     </h3>
     <p>
-      Generated on Fri Dec 05 16:32:23 +0000 2008 with 
+      Generated on Tue Dec 09 15:28:21 +0000 2008 with 
       <a href='http://eigenclass.org/hiki/rcov'>
         rcov 0.8.1.2
       </a>
@@ -174,7 +174,7 @@
     <td class='heading'> Total coverage </td> <td class='heading'> Code coverage
     </td> </tr> </thead> <tbody> <tr class='light'> <td> <a
     href='lib-blackboard_rb.html'> lib/blackboard.rb </a> </td> <td
-    class='lines_total'> <tt> 98 </tt> </td> <td class='lines_code'> <tt> 71
+    class='lines_total'> <tt> 114 </tt> </td> <td class='lines_code'> <tt> 84
     </tt> </td> <td> <table cellspacing='0' align='right' cellpadding='0'> <tr>
     <td> <tt class='coverage_total'> 100.0% </tt> &nbsp; </td> <td> <table
     class='percent_graph' cellspacing='0' cellpadding='0' width='100'> <tr> <td
@@ -190,102 +190,117 @@
     </span><span class="inferred0"><a name="line4"></a> 4 </span><span
     class="marked1"><a name="line5"></a> 5 attr_reader :name, :timestamp, :keys
     </span><span class="inferred0"><a name="line6"></a> 6 </span><span
-    class="marked1"><a name="line7"></a> 7 def initialize name, keys
-    </span><span class="marked0"><a name="line8"></a> 8 @name = name
-    </span><span class="marked1"><a name="line9"></a> 9 @keys = {} </span><span
-    class="marked0"><a name="line10"></a>10 keys.each do |key| </span><span
-    class="marked1"><a name="line11"></a>11
-    @keys[&quot;#{name.to_i}#{key.to_i}&quot;] = key </span><span
-    class="inferred0"><a name="line12"></a>12 end </span><span
-    class="inferred1"><a name="line13"></a>13 </span><span class="marked0"><a
-    name="line14"></a>14 @timestamp = Time.at 0 </span><span
-    class="inferred1"><a name="line15"></a>15 end </span><span
-    class="inferred0"><a name="line16"></a>16 </span><span class="inferred1"><a
-    name="line17"></a>17 end </span><span class="inferred0"><a
-    name="line18"></a>18 </span><span class="marked1"><a name="line19"></a>19
-    class Data </span><span class="inferred0"><a name="line20"></a>20
-    </span><span class="marked1"><a name="line21"></a>21 attr_reader :name,
-    :data, :timestamp </span><span class="inferred0"><a name="line22"></a>22
-    </span><span class="marked1"><a name="line23"></a>23 def initialize name,
-    object </span><span class="marked0"><a name="line24"></a>24 @name = name
-    </span><span class="marked1"><a name="line25"></a>25 raise BlackBoardError,
-    &quot;Object does not have timestamp&quot; unless
-    object.respond_to?(:timestamp) </span><span class="marked0"><a
-    name="line26"></a>26 @data = object </span><span class="marked1"><a
-    name="line27"></a>27 @timestamp = Time.now </span><span class="inferred0"><a
-    name="line28"></a>28 end </span><span class="inferred1"><a
-    name="line29"></a>29 </span><span class="inferred0"><a name="line30"></a>30
-    end </span><span class="inferred1"><a name="line31"></a>31 </span><span
-    class="marked0"><a name="line32"></a>32 class BlackBoard </span><span
-    class="inferred1"><a name="line33"></a>33 </span><span class="marked0"><a
-    name="line34"></a>34 require 'rubygems' </span><span class="marked1"><a
-    name="line35"></a>35 require 'memcache' </span><span class="inferred0"><a
-    name="line36"></a>36 </span><span class="marked1"><a name="line37"></a>37
-    @cache = nil </span><span class="inferred0"><a name="line38"></a>38
-    </span><span class="marked1"><a name="line39"></a>39 attr_reader :topic,
-    :folders </span><span class="inferred0"><a name="line40"></a>40 </span><span
-    class="marked1"><a name="line41"></a>41 def initialize opts = {}
-    </span><span class="marked0"><a name="line42"></a>42 @folders = {}
-    </span><span class="marked1"><a name="line43"></a>43 @ttl = opts[:ttl] || 2
-    </span><span class="marked0"><a name="line44"></a>44 servers =
-    opts[:servers] </span><span class="marked1"><a name="line45"></a>45 servers
-    ||= &quot;127.0.0.1:11411&quot; </span><span class="inferred0"><a
-    name="line46"></a>46 </span><span class="marked1"><a name="line47"></a>47
-    @cache = MemCache.new servers, :namespace =&gt; topic </span><span
-    class="inferred0"><a name="line48"></a>48 end </span><span
-    class="inferred1"><a name="line49"></a>49 </span><span class="marked0"><a
-    name="line50"></a>50 def active? </span><span class="marked1"><a
-    name="line51"></a>51 @cache.active? </span><span class="inferred0"><a
-    name="line52"></a>52 end </span><span class="inferred1"><a
-    name="line53"></a>53 </span><span class="marked0"><a name="line54"></a>54
-    def has_folders? </span><span class="marked1"><a name="line55"></a>55
-    !@folders.empty? </span><span class="inferred0"><a name="line56"></a>56 end
-    </span><span class="inferred1"><a name="line57"></a>57 </span><span
-    class="marked0"><a name="line58"></a>58 def empty? #cycle servers
-    </span><span class="marked1"><a name="line59"></a>59 @cache.stats.inject(0)
-    {|sum, server| sum + server.last[&quot;curr_items&quot;]} == 0 </span><span
-    class="inferred0"><a name="line60"></a>60 end </span><span
-    class="inferred1"><a name="line61"></a>61 </span><span class="marked0"><a
-    name="line62"></a>62 def add_folder name, keys </span><span
-    class="marked1"><a name="line63"></a>63 folder = Pulso::Folder.new name,
-    keys </span><span class="marked0"><a name="line64"></a>64 @folders[name] =
-    folder </span><span class="inferred1"><a name="line65"></a>65 end
-    </span><span class="inferred0"><a name="line66"></a>66 </span><span
-    class="marked1"><a name="line67"></a>67 def add folder, tag, object
-    </span><span class="marked0"><a name="line68"></a>68 id =
-    &quot;#{folder.to_i}#{tag.to_i}&quot; </span><span class="marked1"><a
-    name="line69"></a>69 @cache.add id, Pulso::Data.new(tag, object), @ttl
-    </span><span class="inferred0"><a name="line70"></a>70 end </span><span
-    class="inferred1"><a name="line71"></a>71 </span><span class="marked0"><a
-    name="line72"></a>72 def get folder, obj_name </span><span
-    class="marked1"><a name="line73"></a>73 raise BlackBoardError, &quot;Folder
-    #{folder} not found&quot; unless @folders.has_key?(folder) </span><span
-    class="marked0"><a name="line74"></a>74 id =
-    &quot;#{folder.to_i}#{obj_name.to_i}&quot; </span><span class="marked1"><a
-    name="line75"></a>75 return unless @cache[id] </span><span
-    class="marked0"><a name="line76"></a>76 @cache[id].data </span><span
-    class="inferred1"><a name="line77"></a>77 end </span><span
-    class="inferred0"><a name="line78"></a>78 </span><span class="marked1"><a
-    name="line79"></a>79 def get_folder folder </span><span class="marked0"><a
-    name="line80"></a>80 ret = {} </span><span class="marked1"><a
-    name="line81"></a>81 folder = @folders[folder] </span><span
-    class="marked0"><a name="line82"></a>82
-    @cache.get_multi(*folder.keys.keys).each do |k,v| </span><span
-    class="marked1"><a name="line83"></a>83 ret.store folder.keys[k], v.data
-    </span><span class="inferred0"><a name="line84"></a>84 end </span><span
-    class="marked1"><a name="line85"></a>85 ret </span><span
-    class="inferred0"><a name="line86"></a>86 end </span><span
-    class="inferred1"><a name="line87"></a>87 </span><span class="marked0"><a
-    name="line88"></a>88 def clean </span><span class="marked1"><a
-    name="line89"></a>89 @cache.flush_all </span><span class="inferred0"><a
-    name="line90"></a>90 end </span><span class="inferred1"><a
-    name="line91"></a>91 </span><span class="inferred0"><a name="line92"></a>92
-    end </span><span class="inferred1"><a name="line93"></a>93 </span><span
-    class="marked0"><a name="line94"></a>94 class BlackBoardError &lt;
-    RuntimeError </span><span class="inferred1"><a name="line95"></a>95
-    </span><span class="inferred0"><a name="line96"></a>96 end </span><span
-    class="inferred1"><a name="line97"></a>97 </span><span class="inferred0"><a
-    name="line98"></a>98 end </span></pre>
+    class="marked1"><a name="line7"></a> 7 def initialize name, keys, servers =
+    &quot;127.0.0.1:11411&quot; </span><span class="marked0"><a
+    name="line8"></a> 8 @name = name </span><span class="marked1"><a
+    name="line9"></a> 9 @keys = {} </span><span class="marked0"><a
+    name="line10"></a> 10 keys.each do |key| </span><span class="marked1"><a
+    name="line11"></a> 11 @keys[name] = nil # timestamp </span><span
+    class="inferred0"><a name="line12"></a> 12 end </span><span
+    class="inferred1"><a name="line13"></a> 13 </span><span class="marked0"><a
+    name="line14"></a> 14 @cache = MemCache.new servers, :namespace =&gt; name
+    </span><span class="marked1"><a name="line15"></a> 15 @timestamp = Time.at 0
+    </span><span class="inferred0"><a name="line16"></a> 16 end </span><span
+    class="inferred1"><a name="line17"></a> 17 </span><span class="marked0"><a
+    name="line18"></a> 18 def add obj, ttl </span><span class="marked1"><a
+    name="line19"></a> 19 @keys[obj.name] = obj.timestamp </span><span
+    class="marked0"><a name="line20"></a> 20 @cache.add obj.name, obj, ttl
+    </span><span class="inferred1"><a name="line21"></a> 21 end </span><span
+    class="inferred0"><a name="line22"></a> 22 </span><span class="marked1"><a
+    name="line23"></a> 23 def get obj_name </span><span class="marked0"><a
+    name="line24"></a> 24 ret = @cache[obj_name] </span><span class="marked1"><a
+    name="line25"></a> 25 return if ret.nil? </span><span class="marked0"><a
+    name="line26"></a> 26 ret.data </span><span class="inferred1"><a
+    name="line27"></a> 27 end </span><span class="inferred0"><a
+    name="line28"></a> 28 </span><span class="marked1"><a name="line29"></a> 29
+    def get_all </span><span class="marked0"><a name="line30"></a> 30
+    @cache.get_multi(*@keys.keys) </span><span class="inferred1"><a
+    name="line31"></a> 31 end </span><span class="inferred0"><a
+    name="line32"></a> 32 </span><span class="inferred1"><a name="line33"></a>
+    33 end </span><span class="inferred0"><a name="line34"></a> 34 </span><span
+    class="marked1"><a name="line35"></a> 35 class Data </span><span
+    class="inferred0"><a name="line36"></a> 36 </span><span class="marked1"><a
+    name="line37"></a> 37 attr_reader :name, :data, :timestamp </span><span
+    class="inferred0"><a name="line38"></a> 38 </span><span class="marked1"><a
+    name="line39"></a> 39 def initialize name, object </span><span
+    class="marked0"><a name="line40"></a> 40 @name = name </span><span
+    class="marked1"><a name="line41"></a> 41 raise BlackBoardError, &quot;Object
+    does not have timestamp&quot; unless object.respond_to?(:timestamp)
+    </span><span class="marked0"><a name="line42"></a> 42 @data = object
+    </span><span class="marked1"><a name="line43"></a> 43 @timestamp = Time.now
+    </span><span class="inferred0"><a name="line44"></a> 44 end </span><span
+    class="inferred1"><a name="line45"></a> 45 </span><span class="inferred0"><a
+    name="line46"></a> 46 end </span><span class="inferred1"><a
+    name="line47"></a> 47 </span><span class="marked0"><a name="line48"></a> 48
+    class BlackBoard </span><span class="inferred1"><a name="line49"></a> 49
+    </span><span class="marked0"><a name="line50"></a> 50 require 'rubygems'
+    </span><span class="marked1"><a name="line51"></a> 51 require 'memcache'
+    </span><span class="inferred0"><a name="line52"></a> 52 </span><span
+    class="marked1"><a name="line53"></a> 53 @cache = nil </span><span
+    class="inferred0"><a name="line54"></a> 54 </span><span class="marked1"><a
+    name="line55"></a> 55 attr_reader :folders </span><span class="inferred0"><a
+    name="line56"></a> 56 </span><span class="marked1"><a name="line57"></a> 57
+    def initialize opts = {} </span><span class="marked0"><a name="line58"></a>
+    58 @folders = {} </span><span class="marked1"><a name="line59"></a> 59 @ttl
+    = opts[:ttl] || 2 </span><span class="marked0"><a name="line60"></a> 60
+    @servers = opts[:servers] </span><span class="marked1"><a name="line61"></a>
+    61 @servers ||= &quot;127.0.0.1:11411&quot; </span><span
+    class="inferred0"><a name="line62"></a> 62 end </span><span
+    class="inferred1"><a name="line63"></a> 63 </span><span class="marked0"><a
+    name="line64"></a> 64 def active? </span><span class="marked1"><a
+    name="line65"></a> 65 true #FIXME </span><span class="inferred0"><a
+    name="line66"></a> 66 end </span><span class="inferred1"><a
+    name="line67"></a> 67 </span><span class="marked0"><a name="line68"></a> 68
+    def has_folders? </span><span class="marked1"><a name="line69"></a> 69
+    !@folders.empty? </span><span class="inferred0"><a name="line70"></a> 70 end
+    </span><span class="inferred1"><a name="line71"></a> 71 </span><span
+    class="marked0"><a name="line72"></a> 72 def empty? </span><span
+    class="marked1"><a name="line73"></a> 73
+    MemCache.new(@servers).stats.inject(0) {|sum, server| sum +
+    server.last[&quot;curr_items&quot;]} == 0 </span><span class="inferred0"><a
+    name="line74"></a> 74 end </span><span class="inferred1"><a
+    name="line75"></a> 75 </span><span class="marked0"><a name="line76"></a> 76
+    def add_folder name, keys </span><span class="marked1"><a name="line77"></a>
+    77 folder = Pulso::Folder.new name, keys, @servers </span><span
+    class="marked0"><a name="line78"></a> 78 @folders[name] = folder
+    </span><span class="inferred1"><a name="line79"></a> 79 end </span><span
+    class="inferred0"><a name="line80"></a> 80 </span><span class="marked1"><a
+    name="line81"></a> 81 def add folder, tag, object </span><span
+    class="marked0"><a name="line82"></a> 82 obj_ttl = (@ttl - (Time.now -
+    object.timestamp)).round </span><span class="marked1"><a name="line83"></a>
+    83 return unless obj_ttl &gt; 0 </span><span class="marked0"><a
+    name="line84"></a> 84 @folders[folder].add Pulso::Data.new(tag, object),
+    obj_ttl </span><span class="inferred1"><a name="line85"></a> 85 end
+    </span><span class="inferred0"><a name="line86"></a> 86 </span><span
+    class="marked1"><a name="line87"></a> 87 def get folder, obj_name
+    </span><span class="marked0"><a name="line88"></a> 88 raise BlackBoardError,
+    &quot;Folder #{folder} not found&quot; unless @folders.has_key?(folder)
+    </span><span class="marked1"><a name="line89"></a> 89 @folders[folder].get
+    obj_name </span><span class="inferred0"><a name="line90"></a> 90 end
+    </span><span class="inferred1"><a name="line91"></a> 91 </span><span
+    class="marked0"><a name="line92"></a> 92 def get_folder folder </span><span
+    class="marked1"><a name="line93"></a> 93 ret = {} </span><span
+    class="marked0"><a name="line94"></a> 94 @folders[folder].get_all.each do
+    |k,v| </span><span class="marked1"><a name="line95"></a> 95 ret.store k,
+    v.data </span><span class="inferred0"><a name="line96"></a> 96 end
+    </span><span class="marked1"><a name="line97"></a> 97 ret </span><span
+    class="inferred0"><a name="line98"></a> 98 end </span><span
+    class="inferred1"><a name="line99"></a> 99 </span><span class="marked0"><a
+    name="line100"></a>100 def timestamp folder, obj_name </span><span
+    class="marked1"><a name="line101"></a>101 @folders[folder].keys[obj_name]
+    </span><span class="inferred0"><a name="line102"></a>102 end </span><span
+    class="inferred1"><a name="line103"></a>103 </span><span class="marked0"><a
+    name="line104"></a>104 def clean </span><span class="marked1"><a
+    name="line105"></a>105 MemCache.new(@servers).flush_all </span><span
+    class="inferred0"><a name="line106"></a>106 end </span><span
+    class="inferred1"><a name="line107"></a>107 </span><span
+    class="inferred0"><a name="line108"></a>108 end </span><span
+    class="inferred1"><a name="line109"></a>109 </span><span class="marked0"><a
+    name="line110"></a>110 class BlackBoardError &lt; RuntimeError </span><span
+    class="inferred1"><a name="line111"></a>111 </span><span
+    class="inferred0"><a name="line112"></a>112 end </span><span
+    class="inferred1"><a name="line113"></a>113 </span><span
+    class="inferred0"><a name="line114"></a>114 end </span></pre>
     <hr />
     <p> Generated using the <a href='http://eigenclass.org/hiki.rb?rcov'> rcov
     code coverage analysis tool for Ruby </a> version 0.8.1.2. </p>

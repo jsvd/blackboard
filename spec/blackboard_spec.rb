@@ -110,18 +110,26 @@ describe Pulso::BlackBoard do
       @blackboard.should be_empty
     end
 
-    it "should be empty after single object exceeds time-to-live" do
+    it "should not return nil when retrieving object whose time-to-live was not exceeded" do 
       obj = TestObject.new
       obj.color = :blue
-      @blackboard.add_folder :folder1, [:name1, :name2, :name3]
       @blackboard.add :folder1, :name1, obj
       `sleep 1`
       @blackboard.get(:folder1, :name1).should_not be_nil
+    end
+
+    it "should return nil when retrieving object whose time-to-live was exceeded" do 
+      obj = TestObject.new
+      obj.color = :blue
+      @blackboard.add :folder1, :name1, obj
+      @blackboard.get(:folder1, :name1).should_not be_nil
       `sleep 2`
+      @blackboard.get(:folder1, :name1).should be_nil
+      @blackboard.add :folder1, :name1, obj
       @blackboard.get(:folder1, :name1).should be_nil
     end
 
-    it "should be able to retrieve all data from a folder" do
+    it "should be possible to retrieve all data from a folder" do
       obj = TestObject.new
       obj.color = :blue
       @blackboard.add :folder1, :name1, obj
@@ -137,6 +145,13 @@ describe Pulso::BlackBoard do
       ret[:name3].color.should == :black
     end
 
+    it "should timestamp the BlackBoard::Data object with current time when adding" do
+      obj = TestObject.new
+      obj.color = :blue
+      @blackboard.add_folder :folder1, [:name1, :name2, :name3]
+      @blackboard.add :folder1, :name1, obj
+      @blackboard.timestamp(:folder1, :name1).should be_close Time.now, 0.2
+    end
   end
 
   after :all do
