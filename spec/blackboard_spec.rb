@@ -44,7 +44,7 @@ describe Pulso::BlackBoard do
 
   before :all do
     `memcached -d -p 11411 -P /tmp/memcached-test.pid`
-    @blackboard = Pulso::BlackBoard.new
+    @blackboard = Pulso::BlackBoard.new :ttl => 2
   end
 
   describe "(default)" do 

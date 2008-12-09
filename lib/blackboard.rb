@@ -55,7 +55,7 @@ module Pulso
 
     def initialize opts = {}
       @folders = {}
-      @ttl = opts[:ttl] || 2
+      @ttl = opts[:ttl] || 60
       @servers = opts[:servers]
       @servers ||= "127.0.0.1:11411"
       @cache = MemCache.new(@servers)
