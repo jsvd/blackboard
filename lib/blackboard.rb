@@ -12,12 +12,11 @@ module Pulso
       end
 
       @cache = MemCache.new servers, :namespace => name
-      @timestamp = Time.at 0
     end
 
     def add obj, ttl
       @keys[obj.name] = obj.timestamp
-      @cache.add obj.name, obj, ttl
+      @cache.set obj.name, obj, ttl
     end
     
     def get obj_name
@@ -75,6 +74,7 @@ module Pulso
     end
 
     def add_folder name, keys
+      raise BlackBoardError, "Folder #{name} already exists" if @folders.has_key?(name)
       folder = Pulso::Folder.new name, keys, @servers
       @folders[name] = folder
     end

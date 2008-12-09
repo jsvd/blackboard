@@ -20,10 +20,6 @@ describe Pulso::Folder do
     f.name.should == :folder1
   end
 
-  it "should have a timestamp" do
-    Pulso::Folder.new(:folder1, []).timestamp.should == Time.at(0)
-  end
-
 end
 
 describe Pulso::Data do
@@ -97,6 +93,10 @@ describe Pulso::BlackBoard do
       @blackboard.should_not be_empty
     end
 
+    it "should complain when adding an existant folder" do
+      lambda { @blackboard.add_folder :folder1, [:name3] }.should raise_error Pulso::BlackBoardError
+    end
+
     it "should be able to retrieve object from a folder" do
       obj = TestObject.new
       obj.color = :blue
@@ -148,7 +148,6 @@ describe Pulso::BlackBoard do
     it "should timestamp the BlackBoard::Data object with current time when adding" do
       obj = TestObject.new
       obj.color = :blue
-      @blackboard.add_folder :folder1, [:name1, :name2, :name3]
       @blackboard.add :folder1, :name1, obj
       @blackboard.timestamp(:folder1, :name1).should be_close Time.now, 0.2
     end
