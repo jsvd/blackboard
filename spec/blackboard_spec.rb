@@ -13,10 +13,12 @@ end
 
 describe Pulso::Folder do
 
-  it "should be created with a name" do
+  it "should be created with a name, servers and ttl" do
     f = nil
-    lambda { f = Pulso::Folder.new }.should raise_error
-    lambda { f = Pulso::Folder.new :folder1, [] }.should_not raise_error
+    lambda { f = Pulso::Folder.new }.should raise_error ArgumentError
+    lambda { f = Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411" }.should raise_error ArgumentError
+    lambda { f = Pulso::Folder.new :folder1, [], :ttl => 20 }.should raise_error ArgumentError
+    lambda { f = Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 20 }.should_not raise_error ArgumentError
     f.name.should == :folder1
   end
 

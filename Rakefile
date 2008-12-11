@@ -19,7 +19,7 @@ DESCRIPTION       = ""
 BIN_FILES         = %w(  )
 VERS              = "0.1.1"
 MetricFu::CHURN_OPTIONS = {:scm => :git}
-#MetricFu::DIRECTORIES_TO_FLOG = ['lib']  
+MetricFu::DIRECTORIES_TO_FLOG = ['lib']  
 MetricFu::SAIKURO_OPTIONS = {"--input_directory" => 'lib'}
 
 REV = File.read(".svn/entries")[/committed-rev="(d+)"/, 1] rescue nil

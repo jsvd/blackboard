@@ -2,21 +2,25 @@ module Pulso
 
   class Folder
 
-    attr_reader :name, :timestamp, :keys
+    attr_reader :name, :ttl, :keys
 
-    def initialize name, keys, servers = "127.0.0.1:11411"
+    def initialize name, keys, args = {}
       @name = name
-      @keys = {}
-      keys.each do |key|
-        @keys[key] = nil # timestamp
-      end
 
-      @cache = MemCache.new servers, :namespace => name
+      @ttl = args[:ttl]
+      raise ArgumentError, "Pulso::Folder.new should receive name, keys, servers and ttl" if @ttl.nil? || args[:servers].nil?
+
+      @keys = {}
+      keys.each {|key| @keys[key] = nil}
+      @cache = MemCache.new args[:servers], :namespace => name
     end
 
-    def add obj, ttl
-      @keys[obj.name] = obj.timestamp
-      @cache.set obj.name, obj, ttl
+    def add name, object
+      obj_ttl = (@ttl - (Time.now - object.timestamp)).round
+      return unless obj_ttl > 0
+
+      @keys[name] = object.timestamp
+      @cache.set name, Pulso::Data.new(name, object), obj_ttl
     end
     
     def get obj_name
@@ -74,16 +78,14 @@ module Pulso
       @cache.stats.inject(0) {|sum, server| sum + server.last["curr_items"]} == 0
     end
 
-    def add_folder name, keys
+    def add_folder name, keys, ttl = @ttl
       raise BlackBoardError, "Folder #{name} already exists" if @folders.has_key?(name)
-      folder = Pulso::Folder.new name, keys, @servers
+      folder = Pulso::Folder.new name, keys, :servers => @servers, :ttl => ttl
       @folders[name] = folder
     end
 
     def add folder, tag, object
-      obj_ttl = (@ttl - (Time.now - object.timestamp)).round
-      return unless obj_ttl > 0
-      @folders[folder].add Pulso::Data.new(tag, object), obj_ttl
+      @folders[folder].add tag, object
     end
 
     def get folder, obj_name
