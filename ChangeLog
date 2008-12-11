@@ -1,3 +1,7 @@
+== 0.1.2 / 2008-12-10
+
+* TTL now configured per-folder (or defaults to BB's generic ttl)
+
 == 0.1.1 / 2008-12-09
 
 * Improved get method error handling
