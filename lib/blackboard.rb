@@ -11,7 +11,7 @@ module Pulso
       raise ArgumentError, "Pulso::Folder.new should receive name, keys, servers and ttl" if @ttl.nil? || args[:servers].nil?
 
       @keys = {}
-      keys.each {|key| @keys[key] = nil}
+      keys.each {|key| @keys[key] = Time.at 0 }
       @cache = MemCache.new args[:servers], :namespace => name
     end
 
@@ -85,6 +85,7 @@ module Pulso
     end
 
     def add folder, tag, object
+      return if object.timestamp < timestamp(folder, tag)
       @folders[folder].add tag, object
     end
 

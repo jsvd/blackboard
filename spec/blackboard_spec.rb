@@ -150,6 +150,34 @@ describe Pulso::BlackBoard do
       @blackboard.timestamp(:folder1, :name1).should be_close Time.now, 0.2
     end
 
+    it "should keep a Data object if new one is older" do
+      obj1 = TestObject.new
+      obj1.color = :blue
+      `sleep 1`
+      obj2 = TestObject.new
+      obj2.color = :green
+      @blackboard.add :folder1, :name2, obj2
+      @blackboard.add :folder1, :name2, obj1
+      obj = @blackboard.get :folder1, :name2
+      obj.color.should == :green
+    end
+
+    it "should replace a Data object if new one is newer" do
+      obj1 = TestObject.new
+      obj1.color = :blue
+      `sleep 1`
+      obj2 = TestObject.new
+      obj2.color = :green
+
+      @blackboard.add :folder1, :name2, obj1
+      obj = @blackboard.get :folder1, :name2
+      obj.color.should == :blue
+
+      @blackboard.add :folder1, :name2, obj2
+      obj = @blackboard.get :folder1, :name2
+      obj.color.should == :green
+    end
+
     after :each do
       @blackboard.clean
     end

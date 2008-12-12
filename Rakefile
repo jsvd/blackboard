@@ -17,7 +17,7 @@ AUTHOR            = "João Duarte"
 EMAIL             = "joao-d-duarte@telecom.pt"
 DESCRIPTION       = ""
 BIN_FILES         = %w(  )
-VERS              = "0.1.2"
+VERS              = "0.1.3"
 MetricFu::CHURN_OPTIONS = {:scm => :git}
 MetricFu::DIRECTORIES_TO_FLOG = ['lib']  
 MetricFu::SAIKURO_OPTIONS = {"--input_directory" => 'lib'}
