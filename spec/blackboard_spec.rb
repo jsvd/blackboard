@@ -161,6 +161,10 @@ describe Pulso::BlackBoard do
       @blackboard.timestamp(:folder1, :name1).should be_close Time.now, 0.2
     end
 
+    it "should complain when asking a timestamp from inexistant folder" do
+      lambda { @blackboard.timestamp(:folder10, :name1) }.should raise_error Pulso::BlackBoardError
+    end
+
     it "should keep a Data object if new one is older" do
       obj1 = TestObject.new
       obj1.color = :blue
