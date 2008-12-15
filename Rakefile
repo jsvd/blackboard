@@ -59,7 +59,7 @@ spec = Gem::Specification.new do |s|
 	s.autorequire       = ""
 	s.test_files        = Dir["test/test_*.rb"]
 
-	s.add_dependency('memcache-client', '>=1.5.0')
+	s.add_dependency('memcache-client', '>=1.4.0')
 	s.required_ruby_version = '>= 1.8.5'
 
 	s.files = %w(README ChangeLog Rakefile) +

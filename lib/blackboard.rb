@@ -9,7 +9,8 @@ module Pulso
 
       @ttl = args[:ttl]
       raise ArgumentError, "Pulso::Folder.new should receive name, keys, servers and ttl" if @ttl.nil? || args[:servers].nil?
-
+      raise ArgumentError, "Pulso::Folder.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
+      
       @keys = {}
       keys.each {|key| @keys[key] = Time.at 0 }
       @cache = MemCache.new args[:servers], :namespace => name
@@ -20,7 +21,8 @@ module Pulso
       return unless obj_ttl > 0
 
       @keys[name] = object.timestamp
-      @cache.set name, Pulso::Data.new(name, object), obj_ttl
+      obj = Pulso::Data.new(name, object)
+      @cache.set name, obj, obj_ttl
     end
     
     def get obj_name
@@ -61,6 +63,7 @@ module Pulso
     def initialize opts = {}
       @folders = {}
       @ttl = opts[:ttl] || 60
+      raise ArgumentError, "Pulso::BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
       @servers = opts[:servers]
       @servers ||= "127.0.0.1:11411"
       @cache = MemCache.new(@servers)

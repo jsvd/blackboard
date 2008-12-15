@@ -22,6 +22,12 @@ describe Pulso::Folder do
     f.name.should == :folder1
   end
 
+  it "should complain if ttl is bigger than seconds in 30 days" do
+    lambda { Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 30*24*3600+1 }.should raise_error ArgumentError
+    lambda { Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+  end
+
+
 end
 
 describe Pulso::Data do
@@ -57,6 +63,11 @@ describe Pulso::BlackBoard do
 
     it "should not have folders" do
       @blackboard.should_not have_folders
+    end
+
+    it "should complain if ttl is bigger than seconds in 30 days" do
+      lambda { Pulso::BlackBoard.new :ttl => 30*24*3600+1 }.should raise_error ArgumentError
+      lambda { Pulso::BlackBoard.new :ttl => 30*24*3600 }.should_not raise_error ArgumentError
     end
 
   end
