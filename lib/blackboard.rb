@@ -106,6 +106,7 @@ module Pulso
     end
 
     def timestamp folder, obj_name
+      raise BlackBoardError, "Folder #{folder} not found" unless @folders.has_key?(folder)
       @folders[folder].keys[obj_name]
     end
 
