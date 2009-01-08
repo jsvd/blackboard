@@ -70,6 +70,30 @@ describe Pulso::BlackBoard do
       lambda { Pulso::BlackBoard.new :ttl => 30*24*3600 }.should_not raise_error ArgumentError
     end
 
+    it "should not complain when passing a block of folder method invocations" do
+
+      lambda do
+
+        bb = Pulso::BlackBoard.new do
+
+          folder :folder1, [:name1, :name2] do
+            folder :folder2, [:name1]
+          end
+
+          folder :folder1, [:name1, :name2] do
+            folder :folder2, [:name1] do
+              folder :folder1, [:name1, :name3, :name4]
+              folder :folder2, [:name1, :name3, :name4]
+              folder :folder3, [:name1, :name3, :name4]
+              folder :folder4, [:name1, :name3, :name4]
+            end
+          end
+
+        end
+
+      end.should_not raise_error
+    end
+
   end
 
   describe "(empty)" do

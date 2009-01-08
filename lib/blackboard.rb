@@ -60,7 +60,7 @@ module Pulso
 
     attr_reader  :folders
 
-    def initialize opts = {}
+    def initialize opts = {}, &block
       @folders = {}
       @ttl = opts[:ttl] || 60
       raise ArgumentError, "Pulso::BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
