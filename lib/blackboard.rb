@@ -17,7 +17,7 @@ module Pulso
 
       children.each do |k,v| 
         @subfolders[k] = v if v.is_a?(Pulso::Folder)
-        @keys[key] = Time.at 0 
+        @keys[k] = Time.at 0 
       end
       @cache = MemCache.new args[:servers], :namespace => name
     end
@@ -71,7 +71,7 @@ module Pulso
       @ttl = opts[:ttl] || 60
       @servers = opts[:servers]
       @servers ||= "127.0.0.1:11411"
-      instance_eval &block unless block.nil?
+      instance_eval(&block) unless block.nil?
       raise ArgumentError, "Pulso::BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
       @cache = MemCache.new(@servers)
     end
