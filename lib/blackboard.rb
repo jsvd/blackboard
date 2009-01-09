@@ -10,12 +10,15 @@ module Pulso
       @name = name
 
       @keys = {}
+      @subfolders = {}
       @ttl = args[:ttl]
       raise ArgumentError, "Pulso::Folder.new should receive name, keys, servers and ttl" if @ttl.nil? || args[:servers].nil?
       raise ArgumentError, "Pulso::Folder.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
 
-      @subfolders = children.select {|k,v| v.is_a?(Pulso::Folder)}
-      children.each {|key| @keys[key] = Time.at 0 }
+      children.each do |k,v| 
+        @subfolders[k] = v if v.is_a?(Pulso::Folder)
+        @keys[key] = Time.at 0 
+      end
       @cache = MemCache.new args[:servers], :namespace => name
     end
 
