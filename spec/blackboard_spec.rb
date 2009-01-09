@@ -27,6 +27,10 @@ describe Pulso::Folder do
     lambda { Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
   end
 
+  it "should not complain when receiving childern folders" do
+    f = Pulso::Folder.new :"folder1.folder2", [:name4, :name5,], :servers => "127.0.0.1:11411", :ttl => 30*24*3600
+    lambda { Pulso::Folder.new :folder1, [:name1, :name2, f], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+  end
 
 end
 
@@ -52,7 +56,9 @@ describe Pulso::BlackBoard do
 
   before :all do
     `memcached -d -p 11411 -P /tmp/memcached-test.pid`
-    @blackboard = Pulso::BlackBoard.new :ttl => 2
+    @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+      folder :folder1, [:name1, :name2]
+    end
   end
 
   describe "(default)" do 
@@ -61,37 +67,13 @@ describe Pulso::BlackBoard do
       @blackboard.should be_active
     end
 
-    it "should not have folders" do
-      @blackboard.should_not have_folders
+    it "should have folders" do
+      @blackboard.should have_folders
     end
 
     it "should complain if ttl is bigger than seconds in 30 days" do
       lambda { Pulso::BlackBoard.new :ttl => 30*24*3600+1 }.should raise_error ArgumentError
       lambda { Pulso::BlackBoard.new :ttl => 30*24*3600 }.should_not raise_error ArgumentError
-    end
-
-    it "should not complain when passing a block of folder method invocations" do
-
-      lambda do
-
-        bb = Pulso::BlackBoard.new do
-
-          folder :folder1, [:name1, :name2] do
-            folder :folder2, [:name1]
-          end
-
-          folder :folder1, [:name1, :name2] do
-            folder :folder2, [:name1] do
-              folder :folder1, [:name1, :name3, :name4]
-              folder :folder2, [:name1, :name3, :name4]
-              folder :folder3, [:name1, :name3, :name4]
-              folder :folder4, [:name1, :name3, :name4]
-            end
-          end
-
-        end
-
-      end.should_not raise_error
     end
 
   end
@@ -101,9 +83,11 @@ describe Pulso::BlackBoard do
     it { @blackboard.should be_empty }
 
     it "should have folders after adding one" do
-      @blackboard.add_folder :folder1, [:name1, :name2, :name3]
-      @blackboard.should have_folders
-      @blackboard.folders.keys.should include(:folder1)
+      bb = Pulso::BlackBoard.new do
+        folder :folder1, [:name1, :name2]
+      end
+      bb.should have_folders
+      bb.folders.keys.should include(:folder1)
     end
 
     # TODO improve by regexp matching
@@ -124,7 +108,10 @@ describe Pulso::BlackBoard do
   describe "(non-empty)" do
     
     before :all do
-      @blackboard.add_folder :folder1, [:name1, :name2, :name3]
+      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+        folder :folder1, [:name1, :name2, :name3]
+      end
+      @blackboard.folders.keys.should include(:folder1)
     end
 
     before :each do
@@ -142,10 +129,6 @@ describe Pulso::BlackBoard do
     it "should not be empty" do 
       @blackboard.should have_folders
       @blackboard.should_not be_empty
-    end
-
-    it "should complain when adding an existant folder" do
-      lambda { @blackboard.add_folder :folder1, [:name3] }.should raise_error Pulso::BlackBoardError
     end
 
     it "should be able to retrieve object from a folder" do
