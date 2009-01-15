@@ -13,37 +13,41 @@ end
 
 describe Pulso::Folder do
 
+  before :each do
+    @cache = MemCache.new("127.0.0.1:11411", :namespace => 'blackboard')
+  end
+
   it "should be created with a name, servers and ttl" do
     f = nil
     lambda { f = Pulso::Folder.new }.should raise_error ArgumentError
-    lambda { f = Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411" }.should raise_error ArgumentError
+    lambda { f = Pulso::Folder.new :folder1, [], :cache => @cache }.should raise_error ArgumentError
     lambda { f = Pulso::Folder.new :folder1, [], :ttl => 20 }.should raise_error ArgumentError
-    lambda { f = Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 20 }.should_not raise_error ArgumentError
+    lambda { f = Pulso::Folder.new :folder1, [], :cache => @cache, :ttl => 20 }.should_not raise_error ArgumentError
     f.name.should == :folder1
   end
 
   it "should complain if ttl is bigger than seconds in 30 days" do
-    lambda { Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 30*24*3600+1 }.should raise_error ArgumentError
-    lambda { Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+    lambda { Pulso::Folder.new :folder1, [], :cache => @cache, :ttl => 30*24*3600+1 }.should raise_error ArgumentError
+    lambda { Pulso::Folder.new :folder1, [], :cache => @cache, :ttl => 30*24*3600 }.should_not raise_error ArgumentError
   end
 
   it "should not complain when creating subfolders" do
     lambda { 
-      Pulso::Folder.new :folder1, [:name1, :name2], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 do
+      Pulso::Folder.new :folder1, [:name1, :name2], :cache => @cache, :ttl => 30*24*3600 do
         folder :folder2, [:name4, :name5], :ttl => 30*24*3600
       end
     }.should_not raise_error ArgumentError
   end
 
   it "should return a kind of Hash" do
-    f = Pulso::Folder.new :folder1, [:name1], :servers => "127.0.0.1:11411", :ttl => 20
+    f = Pulso::Folder.new :folder1, [:name1], :cache => @cache, :ttl => 20
     f.should be_a_kind_of Hash
     f.should == { :name1 => nil }
   end
 
   it "should respond to folder name method" do
     `memcached -d -p 11411 -P /tmp/memcached-test.pid`
-    k = Pulso::Folder.new :folder1, [:name1, :name2], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 do
+    k = Pulso::Folder.new :folder1, [:name1, :name2], :cache => @cache, :ttl => 30*24*3600 do
       folder :folder2, [:name1]
     end
     lambda { k.folder2 }.should_not raise_error
@@ -267,6 +271,84 @@ describe Pulso::BlackBoard do
       lambda { @blackboard.folder1.folder2.name5 = obj }.should_not raise_error
 
     end
+
+    it "should allow different ttl for subfolders" do
+      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+        folder :folder1, [:name1], :ttl => 1
+        folder :folder2, [:name2], :ttl => 2
+      end
+      obj = TestObject.new 
+      obj.color = :green
+      @blackboard.folder1.name1 = obj
+      @blackboard.folder2.name2 = obj
+      @blackboard.folder1.name1.should_not be_nil
+      @blackboard.folder2.name2.should_not be_nil
+      `sleep 1`
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder2.name2.should_not be_nil
+      `sleep 1`
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder2.name2.should be_nil
+    end
+
+    it "should allow different ttl between folder and subfolder" do
+      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+        folder :folder1, [:name1], :ttl => 1 do
+          folder :folder2, [:name2], :ttl => 2
+        end
+      end
+      obj = TestObject.new 
+      obj.color = :green
+      @blackboard.folder1.name1 = obj
+      @blackboard.folder1.folder2.name2 = obj
+
+      @blackboard.folder1.name1.should_not be_nil
+      @blackboard.folder1.folder2.name2.should_not be_nil
+      `sleep 1`
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder1.folder2.name2.should_not be_nil
+      `sleep 1`
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder1.folder2.name2.should be_nil
+    end
+
+    it "should propagate tll to subfolders " do
+      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+        folder :folder1, [:name1], :ttl => 1 do
+          folder :folder2, [:name2]
+        end
+      end
+      obj = TestObject.new 
+      obj.color = :green
+      @blackboard.folder1.name1 = obj
+      @blackboard.folder1.folder2.name2 = obj
+
+      @blackboard.folder1.name1.should_not be_nil
+      @blackboard.folder1.folder2.name2.should_not be_nil
+      `sleep 1`
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder1.folder2.name2.should be_nil
+      `sleep 1`
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder1.folder2.name2.should be_nil
+    end
+
+    it "should support writing to two elements with same name on different folders" do
+      @blackboard = Pulso::BlackBoard.new :ttl => 10 do
+        folder :folder1, [:name1]
+        folder :folder2, [:name1]
+      end
+      obj = TestObject.new 
+      obj.color = :green
+      @blackboard.folder1.name1 = obj
+      obj = TestObject.new 
+      obj.color = :blue
+      @blackboard.folder2.name1 = obj
+
+      @blackboard.folder1.name1.color.should == :green
+      @blackboard.folder2.name1.color.should == :blue
+    end
+
   end
 
   after :all do
