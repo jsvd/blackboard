@@ -27,9 +27,12 @@ describe Pulso::Folder do
     lambda { Pulso::Folder.new :folder1, [], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
   end
 
-  it "should not complain when receiving childern folders" do
-    f = Pulso::Folder.new :folder2, [:name4, :name5], :servers => "127.0.0.1:11411", :ttl => 30*24*3600
-    lambda { Pulso::Folder.new :folder1, [:name1, :name2, f], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+  it "should not complain when creating subfolders" do
+    lambda { 
+      Pulso::Folder.new :folder1, [:name1, :name2], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 do
+        folder :folder2, [:name4, :name5], :ttl => 30*24*3600
+      end
+    }.should_not raise_error ArgumentError
   end
 
   it "should return a kind of Hash" do
@@ -39,11 +42,13 @@ describe Pulso::Folder do
   end
 
   it "should respond to folder name method" do
+    `memcached -d -p 11411 -P /tmp/memcached-test.pid`
     k = Pulso::Folder.new :folder1, [:name1, :name2], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 do
       folder :folder2, [:name1]
     end
     lambda { k.folder2 }.should_not raise_error
     k.folder2.should == { :name1 => nil } 
+    `killall memcached`
   end
 
 end
@@ -124,6 +129,7 @@ describe Pulso::BlackBoard do
     before :all do
       @blackboard = Pulso::BlackBoard.new :ttl => 2 do
         folder :folder1, [:name1, :name2, :name3]
+        folder :folder2, [:name4, :name5, :name6]
       end
       @blackboard.folders.keys.should include(:folder1)
     end
@@ -142,6 +148,9 @@ describe Pulso::BlackBoard do
 
     it "should not be empty" do 
       @blackboard.should have_folders
+      obj = TestObject.new
+      obj.color = :green
+      @blackboard.folder1.name2 = obj
       @blackboard.should_not be_empty
     end
 
@@ -192,9 +201,9 @@ describe Pulso::BlackBoard do
       `sleep 1`
       obj2 = TestObject.new
       obj2.color = :green
-      @blackboard.folder1.name2 = obj2
-      @blackboard.folder1.name2 = obj1
-      obj = @blackboard.folder1.name2
+      @blackboard.folder2.name5 = obj2
+      @blackboard.folder2.name5 = obj1
+      obj = @blackboard.folder2.name5
       obj.color.should == :green
     end
 
