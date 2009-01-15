@@ -28,8 +28,22 @@ describe Pulso::Folder do
   end
 
   it "should not complain when receiving childern folders" do
-    f = Pulso::Folder.new :"folder1.folder2", [:name4, :name5,], :servers => "127.0.0.1:11411", :ttl => 30*24*3600
+    f = Pulso::Folder.new :folder2, [:name4, :name5], :servers => "127.0.0.1:11411", :ttl => 30*24*3600
     lambda { Pulso::Folder.new :folder1, [:name1, :name2, f], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+  end
+
+  it "should return a kind of Hash" do
+    f = Pulso::Folder.new :folder1, [:name1], :servers => "127.0.0.1:11411", :ttl => 20
+    f.should be_a_kind_of Hash
+    f.should == { :name1 => nil }
+  end
+
+  it "should respond to folder name method" do
+    k = Pulso::Folder.new :folder1, [:name1, :name2], :servers => "127.0.0.1:11411", :ttl => 30*24*3600 do
+      folder :folder2, [:name1]
+    end
+    lambda { k.folder2 }.should_not raise_error
+    k.folder2.should == { :name1 => nil } 
   end
 
 end
@@ -92,15 +106,15 @@ describe Pulso::BlackBoard do
 
     # TODO improve by regexp matching
     it "should complain when retrieving from inexistant folder" do
-      lambda { @blackboard.get :folder2, :name1 }.should raise_error Pulso::BlackBoardError
+      lambda { @blackboard.folder2.name1 }.should raise_error Pulso::BlackBoardError
     end
 
     it "should return nil when retrieving known data key from folder" do
-      @blackboard.get(:folder1, :name2).should be_nil
+      @blackboard.folder1.name2.should be_nil
     end
 
     it "should complain when retrieving unknown data key from folder" do
-      lambda { @blackboard.get(:folder1, :name5) }.should raise_error Pulso::BlackBoardError
+      lambda { @blackboard.folder1.name5 }.should raise_error Pulso::BlackBoardError
     end
 
   end
@@ -117,13 +131,13 @@ describe Pulso::BlackBoard do
     before :each do
       @obj = TestObject.new
       @obj.color = :green
-      @blackboard.add :folder1, :name2, @obj
+      @blackboard.folder1.name2 = @obj
       @obj = TestObject.new
       @obj.color = :black
-      @blackboard.add :folder1, :name3, @obj
+      @blackboard.folder1.name3 = @obj
       @obj = TestObject.new
       @obj.color = :blue
-      @blackboard.add :folder1, :name1, @obj
+      @blackboard.folder1.name1 = @obj
     end
 
     it "should not be empty" do 
@@ -132,7 +146,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should be able to retrieve object from a folder" do
-      obj = @blackboard.get :folder1, :name1
+      obj = @blackboard.folder1.name1
       obj.color.should == :blue
     end
 
@@ -143,28 +157,28 @@ describe Pulso::BlackBoard do
 
     it "should not return nil when retrieving object whose time-to-live was not exceeded" do 
       `sleep 1`
-      @blackboard.get(:folder1, :name1).should_not be_nil
+      @blackboard.folder1.name1.should_not be_nil
     end
 
     it "should return nil when retrieving object whose time-to-live was exceeded" do 
-      @blackboard.get(:folder1, :name1).should_not be_nil
+      @blackboard.folder1.name1.should_not be_nil
       `sleep 2`
-      @blackboard.get(:folder1, :name1).should be_nil
-      @blackboard.add :folder1, :name1, @obj # already expired
-      @blackboard.get(:folder1, :name1).should be_nil
+      @blackboard.folder1.name1.should be_nil
+      @blackboard.folder1.name1 = @obj # already expired
+      @blackboard.folder1.name1.should be_nil
     end
 
     it "should be possible to retrieve all data from a folder" do
-      ret = @blackboard.get_folder :folder1
-      ret[:name1].color.should == :blue
-      ret[:name2].color.should == :green
-      ret[:name3].color.should == :black
+      ret = @blackboard.folder1
+      ret.name1.color.should == :blue
+      ret.name2.color.should == :green
+      ret.name3.color.should == :black
     end
 
     it "should timestamp the BlackBoard::Data object with current time when adding" do
       obj = TestObject.new
       obj.color = :blue
-      @blackboard.add :folder1, :name1, obj
+      @blackboard.folder1.name1 = obj
       @blackboard.timestamp(:folder1, :name1).should be_close Time.now, 0.2
     end
 
@@ -178,9 +192,9 @@ describe Pulso::BlackBoard do
       `sleep 1`
       obj2 = TestObject.new
       obj2.color = :green
-      @blackboard.add :folder1, :name2, obj2
-      @blackboard.add :folder1, :name2, obj1
-      obj = @blackboard.get :folder1, :name2
+      @blackboard.folder1.name2 = obj2
+      @blackboard.folder1.name2 = obj1
+      obj = @blackboard.folder1.name2
       obj.color.should == :green
     end
 
@@ -191,17 +205,58 @@ describe Pulso::BlackBoard do
       obj2 = TestObject.new
       obj2.color = :green
 
-      @blackboard.add :folder1, :name2, obj1
-      obj = @blackboard.get :folder1, :name2
+      @blackboard.folder1.name2 = obj1
+      obj = @blackboard.folder1.name2
       obj.color.should == :blue
 
-      @blackboard.add :folder1, :name2, obj2
-      obj = @blackboard.get :folder1, :name2
+      @blackboard.folder1.name2 = obj2
+      obj = @blackboard.folder1.name2
       obj.color.should == :green
     end
 
     after :each do
       @blackboard.clean
+    end
+  end
+
+  describe "(with subfolders)" do
+
+    it "should allow subfolders" do
+
+      lambda { 
+        @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+          folder :folder1, [:name1, :name2, :name3] do
+            folder :folder2, [:name4, :name5]
+          end
+        end
+      }.should_not raise_error
+
+      @blackboard.folder1.should == { :name1 => nil, :name2 => nil, :name3 => nil, :folder2 => { :name4 => nil, :name5 => nil } }
+
+    end
+
+    it "should be possible to write to a subfolder" do
+
+      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+        folder :folder1, [:name1, :name2, :name3] do
+          folder :folder2, [:name4, :name5]
+        end
+      end
+
+      obj = TestObject.new 
+      obj.color = :green
+
+      lambda { @blackboard.folder1.folder2.name5 = obj }.should_not raise_error
+
+      ret = @blackboard.folder1.folder2.name5
+      ret.color.should == :green
+
+      ret = @blackboard.folder1.folder2
+      ret[:name4].should be_nil
+      ret[:name5].color.should == :green
+
+      lambda { @blackboard.folder1.folder2.name5 = obj }.should_not raise_error
+
     end
   end
 

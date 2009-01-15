@@ -2,24 +2,56 @@
 
 module Pulso
 
-  class Folder
+  class Folder < Hash
 
     attr_reader :name, :ttl, :keys
 
-    def initialize name, children, args = {}
+    def initialize name, children, args = {}, &block
       @name = name
 
       @keys = {}
-      @subfolders = {}
+      @folders = []
       @ttl = args[:ttl]
+      @servers = args[:servers]
+
       raise ArgumentError, "Pulso::Folder.new should receive name, keys, servers and ttl" if @ttl.nil? || args[:servers].nil?
       raise ArgumentError, "Pulso::Folder.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
 
-      children.each do |k,v| 
-        @subfolders[k] = v if v.is_a?(Pulso::Folder)
-        @keys[k] = Time.at 0 
+      children.each do |child| 
+        self[child] = nil
+        instance_eval %Q{
+        def #{child}=(object); add :#{child}, object; end
+        def #{child}; self[:#{child}] = get :#{child}; end}
+        @keys[child] = Time.at 0 
       end
-      @cache = MemCache.new args[:servers], :namespace => name
+
+      instance_eval(&block) unless block.nil?
+
+      @cache = MemCache.new @servers, :namespace => name
+    end
+
+    def get_all
+      @cache.get_multi(*@keys.keys).each {|k, v| self[k] = (v.nil?) ? nil : v.data }
+    end
+
+    def method_missing folder
+      raise BlackBoardError, "Folder #{folder} not found"
+    end
+
+    def _update
+      get_all
+      @folders.each {|f| self[f]._update }
+      self
+    end
+
+    private
+    def folder name, keys, ttl = @ttl, &block
+      raise BlackBoardError, "Folder #{name} already exists" if self.has_key?(name)
+      folder = Pulso::Folder.new name, keys, :servers => @servers, :ttl => ttl, &block
+      @folders << name
+      self[name] = folder
+      instance_eval %Q{def #{name}; self[:#{name}]._update ;self[:#{name}]; end}
+      instance_eval(&block) unless block.nil?
     end
 
     def add name, object
@@ -36,10 +68,6 @@ module Pulso
       ret = @cache[obj_name]
       return if ret.nil?
       ret.data
-    end
-
-    def get_all
-      @cache.get_multi(*@keys.keys)
     end
 
   end
@@ -69,10 +97,10 @@ module Pulso
     def initialize opts = {}, &block
       @folders = {}
       @ttl = opts[:ttl] || 60
+      raise ArgumentError, "Pulso::BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
       @servers = opts[:servers]
       @servers ||= "127.0.0.1:11411"
       instance_eval(&block) unless block.nil?
-      raise ArgumentError, "Pulso::BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
       @cache = MemCache.new(@servers)
     end
 
@@ -90,26 +118,9 @@ module Pulso
 
     def folder name, keys, ttl = @ttl, &block
       raise BlackBoardError, "Folder #{name} already exists" if @folders.has_key?(name)
-      folder = Pulso::Folder.new name, keys, :servers => @servers, :ttl => ttl
+      folder = Pulso::Folder.new name, keys, :servers => @servers, :ttl => ttl, &block
       @folders[name] = folder
-    end
-
-    def add folder, tag, object
-      return if object.timestamp < timestamp(folder, tag)
-      @folders[folder].add tag, object
-    end
-
-    def get folder, obj_name
-      raise BlackBoardError, "Folder #{folder} not found" unless @folders.has_key?(folder)
-      @folders[folder].get obj_name
-    end
-
-    def get_folder folder
-      ret = {}
-      @folders[folder].get_all.each do |k,v|
-        ret.store k, v.data
-      end
-      ret
+      instance_eval %Q{def #{name}; @folders[:#{name}]._update; @folders[:#{name}]; end}
     end
 
     def timestamp folder, obj_name
@@ -120,6 +131,22 @@ module Pulso
     def clean
       @cache.flush_all
     end
+
+    def method_missing folder
+      raise BlackBoardError, "Folder #{folder} not found"
+    end
+
+    private
+    def add folder, tag, object
+      return if object.timestamp < timestamp(folder, tag)
+      @folders[folder].add tag, object
+    end
+
+    def get folder, obj_name
+      raise BlackBoardError, "Folder #{folder} not found" unless @folders.has_key?(folder)
+      @folders[folder].get obj_name
+    end
+
 
   end
 
