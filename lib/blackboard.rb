@@ -4,12 +4,12 @@ module Pulso
 
   class Folder < Hash
 
-    attr_reader :name, :ttl, :keys
+    attr_reader :name, :ttl
 
     def initialize name, children, args = {}, &block
       @name = name
 
-      @keys = {}
+      @items = {}
       @folders = []
       @ttl = args[:ttl]
       @cache = args[:cache]
@@ -28,7 +28,7 @@ module Pulso
     end
 
     def _update
-      @keys.keys.each do |k|
+      @items.keys.each do |k|
         self[k] = get k
       end
       @folders.each {|f| self[f]._update }
@@ -52,23 +52,23 @@ module Pulso
         instance_eval %Q{
         def #{child}=(object); add :#{child}, object; end
         def #{child}; self[:#{child}] = get :#{child}; end}
-        @keys[child] = Time.at 0 
+        @items[child] = Time.at 0 
       end
     end
 
     def add name, object
       obj_ttl = (@ttl - (Time.now - object.timestamp)).round
       return unless obj_ttl > 0
-      return if object.timestamp < @keys[name]
+      return if object.timestamp < @items[name]
       #puts "adding #{name} that has color #{object.color}"
 
-      @keys[name] = object.timestamp
+      @items[name] = object.timestamp
       obj = Pulso::Data.new(name, object)
       @cache.set "#{@name}.#{name}", obj, obj_ttl
     end
 
     def get obj_name
-      raise BlackBoardError, "Key #{obj_name} doesn't exist in folder #{@name}." unless @keys.has_key?(obj_name)
+      raise BlackBoardError, "Key #{obj_name} doesn't exist in folder #{@name}." unless @items.has_key?(obj_name)
       ret = @cache["#{@name}.#{obj_name}"]
       return if ret.nil?
       ret.data
@@ -127,11 +127,6 @@ module Pulso
       folder = Pulso::Folder.new name, keys, :cache => @cache, :ttl => ttl, &block
       @folders[name] = folder
       instance_eval %Q{def #{name}; @folders[:#{name}]._update; @folders[:#{name}]; end}
-    end
-
-    def timestamp folder, obj_name
-      raise BlackBoardError, "Folder #{folder} not found" unless @folders.has_key?(folder)
-      @folders[folder].keys[obj_name]
     end
 
     def clean
