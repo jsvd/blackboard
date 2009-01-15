@@ -23,16 +23,14 @@ module Pulso
 
     end
 
-    def get_all
-      @cache.get_multi(*@keys.keys).each {|k, v| self[k] = (v.nil?) ? nil : v.data }
-    end
-
     def method_missing folder
       raise BlackBoardError, "Folder #{folder} not found"
     end
 
     def _update
-      get_all
+      @keys.keys.each do |k|
+        self[k] = get k
+      end
       @folders.each {|f| self[f]._update }
     end
 
