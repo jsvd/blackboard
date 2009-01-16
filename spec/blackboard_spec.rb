@@ -345,6 +345,26 @@ describe Pulso::BlackBoard do
       @blackboard.folder2.name1.color.should == :blue
     end
 
+    it "should not complain when creating sub sub folders" do
+      lambda { @blackboard = Pulso::BlackBoard.new :ttl => 10 do
+        folder :folder1, [:name1] do
+          folder :folder1, [:name1] do
+            folder :folder1, [:name1] do
+              folder :folder1, [:name1] do
+                folder :folder1, [:name1] do
+                  folder :folder1, [:name1]
+                end
+              end
+            end
+          end
+        end
+      end }.should_not raise_error
+      obj = TestObject.new 
+      obj.color = :green
+      @blackboard.folder1.folder1.folder1.folder1.folder1.folder1.name1 = obj
+      @blackboard.folder1.folder1.folder1.folder1.folder1.folder1.name1.color.should == :green
+    end
+
   end
 
   after :all do

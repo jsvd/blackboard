@@ -39,11 +39,10 @@ module Pulso
       raise BlackBoardError, "Folder #{name} already exists" if self.has_key?(name)
       ttl = args[:ttl]
       ttl ||= @ttl
-      folder = Pulso::Folder.new "#{@name}.#{name}", keys, :cache => @cache, :ttl => ttl, &block
       @folders << name
-      self[name] = folder
+      self[name] = Pulso::Folder.new "#{@name}.#{name}", keys, :cache => @cache, :ttl => ttl, &block
       instance_eval %Q{def #{name}; self[:#{name}]._update ;self[:#{name}]; end}
-      instance_eval(&block) unless block.nil?
+      
     end
 
     def create_children children
@@ -60,7 +59,6 @@ module Pulso
       obj_ttl = (@ttl - (Time.now - object.timestamp)).round
       return unless obj_ttl > 0
       return if object.timestamp < @items[name]
-      #puts "adding #{name} that has color #{object.color}"
 
       @items[name] = object.timestamp
       obj = Pulso::Data.new(name, object)
@@ -124,9 +122,8 @@ module Pulso
       raise BlackBoardError, "Folder #{name} already exists" if @folders.has_key?(name)
       ttl = args[:ttl]
       ttl ||= @ttl
-      folder = Pulso::Folder.new name, keys, :cache => @cache, :ttl => ttl, &block
-      @folders[name] = folder
       instance_eval %Q{def #{name}; @folders[:#{name}]._update; @folders[:#{name}]; end}
+      @folders[name] = Pulso::Folder.new name, keys, :cache => @cache, :ttl => ttl, &block
     end
 
     def clean
