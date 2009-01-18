@@ -3,7 +3,7 @@ spec = Gem::Specification.new do |s|
 	s.version           = "0.2.3"
 	s.platform          = Gem::Platform::RUBY
 	s.has_rdoc          = false
-	s.extra_rdoc_files  = ["README", "ChangeLog"]
+#	s.extra_rdoc_files  = ["README", "ChangeLog"]
 #	s.rdoc_options     = RDOC_OPTS + ['--exclude', '^(examples|extras)/']
 	s.summary           = ""
 	s.description       = ""
@@ -12,7 +12,7 @@ spec = Gem::Specification.new do |s|
 	s.executables       = %w(  )
 	s.bindir            = "bin"
 	s.require_path      = "lib"
-	s.test_files        = Dir["test/test_*.rb"]
+	s.test_files        = "spec/blackboard_spec.rb"
 
 	s.add_dependency('memcache-client', '>=1.4.0')
 	s.required_ruby_version = '>= 1.8.5'
