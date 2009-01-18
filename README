@@ -4,6 +4,37 @@
 
 == Description
 
+BlackBoard provides a folder-layer to memcache-client. A BlackBoard is created with a static structure of folders and items.
+
+bb = Pulso::BlackBoard.new :ttl => 2 do
+ folder :folder1, [:name1] do
+   folder :folder1, [:name1, :name2]
+   folder :folder2, [:name2]
+   folder :folder3, [:name2]
+ end
+
+It is aimed at quickly writing and reading, usually attached to EventMachine, for example.
+Objects written to the blackboard must answer to :timestamp, for they will expire.
+
+class TestObject
+  attr_reader :timestamp
+  def initialize; @timestamp = Time.now; end
+end
+
+obj = TestObject.new
+
+To write an item from a folder:
+
+bb.folder1.folder1.name1 = obj
+
+To retrieve an item from a folder
+
+obj = bb.folder1.folder1.name1
+
+To retrive all items in a folder:
+
+items = bb.folder1
+obj = items[:folder1][:name1]
 
 == Installation
 
@@ -18,12 +49,14 @@
 
 == Features/Problems
 
+Must include Pulso module to use.
+Fully specced.
 
 == Synopsis
 
 
 == Copyright
 
-Author::    jsvd <jsvd@>
+Author::    João Duarte <jsvduarte@gmail.com>
 Copyright:: Copyright (c) 2008 jsvd
 License::   
