@@ -6,7 +6,7 @@
 
 BlackBoard provides a folder-layer to memcache-client. A BlackBoard is created with a static structure of folders and items.
 
-bb = Pulso::BlackBoard.new :ttl => 2 do
+bb = BlackBoard.new :ttl => 2 do
  folder :folder1, [:name1] do
    folder :folder1, [:name1, :name2]
    folder :folder2, [:name2]
@@ -49,7 +49,6 @@ obj = items[:folder1][:name1]
 
 == Features/Problems
 
-Must include Pulso module to use.
 Fully specced.
 
 == Synopsis

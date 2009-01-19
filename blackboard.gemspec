@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
 	s.name              = "blackboard"
-	s.version           = "0.2.3"
+	s.version           = "0.2.4"
 	s.platform          = Gem::Platform::RUBY
 	s.has_rdoc          = false
 	s.summary           = ""

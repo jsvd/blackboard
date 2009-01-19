@@ -11,7 +11,7 @@ class TestObject
   attr_reader :timestamp
 end
 
-describe Pulso::Folder do
+describe BlackBoard::Folder do
 
   before :each do
     @cache = MemCache.new("127.0.0.1:11411", :namespace => 'blackboard')
@@ -19,35 +19,35 @@ describe Pulso::Folder do
 
   it "should be created with a name, servers and ttl" do
     f = nil
-    lambda { f = Pulso::Folder.new }.should raise_error ArgumentError
-    lambda { f = Pulso::Folder.new :folder1, [], :cache => @cache }.should raise_error ArgumentError
-    lambda { f = Pulso::Folder.new :folder1, [], :ttl => 20 }.should raise_error ArgumentError
-    lambda { f = Pulso::Folder.new :folder1, [], :cache => @cache, :ttl => 20 }.should_not raise_error ArgumentError
+    lambda { f = BlackBoard::Folder.new }.should raise_error ArgumentError
+    lambda { f = BlackBoard::Folder.new :folder1, [], :cache => @cache }.should raise_error ArgumentError
+    lambda { f = BlackBoard::Folder.new :folder1, [], :ttl => 20 }.should raise_error ArgumentError
+    lambda { f = BlackBoard::Folder.new :folder1, [], :cache => @cache, :ttl => 20 }.should_not raise_error ArgumentError
     f.name.should == :folder1
   end
 
   it "should complain if ttl is bigger than seconds in 30 days" do
-    lambda { Pulso::Folder.new :folder1, [], :cache => @cache, :ttl => 30*24*3600+1 }.should raise_error ArgumentError
-    lambda { Pulso::Folder.new :folder1, [], :cache => @cache, :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+    lambda { BlackBoard::Folder.new :folder1, [], :cache => @cache, :ttl => 30*24*3600+1 }.should raise_error ArgumentError
+    lambda { BlackBoard::Folder.new :folder1, [], :cache => @cache, :ttl => 30*24*3600 }.should_not raise_error ArgumentError
   end
 
   it "should not complain when creating subfolders" do
     lambda { 
-      Pulso::Folder.new :folder1, [:name1, :name2], :cache => @cache, :ttl => 30*24*3600 do
+      BlackBoard::Folder.new :folder1, [:name1, :name2], :cache => @cache, :ttl => 30*24*3600 do
         folder :folder2, [:name4, :name5], :ttl => 30*24*3600
       end
     }.should_not raise_error ArgumentError
   end
 
   it "should return a kind of Hash" do
-    f = Pulso::Folder.new :folder1, [:name1], :cache => @cache, :ttl => 20
+    f = BlackBoard::Folder.new :folder1, [:name1], :cache => @cache, :ttl => 20
     f.should be_a_kind_of Hash
     f.should == { :name1 => nil }
   end
 
   it "should respond to folder name method" do
     `memcached -d -p 11411 -P /tmp/memcached-test.pid`
-    k = Pulso::Folder.new :folder1, [:name1, :name2], :cache => @cache, :ttl => 30*24*3600 do
+    k = BlackBoard::Folder.new :folder1, [:name1, :name2], :cache => @cache, :ttl => 30*24*3600 do
       folder :folder2, [:name1]
     end
     lambda { k.folder2 }.should_not raise_error
@@ -57,29 +57,29 @@ describe Pulso::Folder do
 
 end
 
-describe Pulso::Data do
+describe BlackBoard::Data do
 
   it "should be initialized with a name and an object that responds to :timestamp" do
-    lambda { Pulso::Data.new }.should raise_error
-    lambda { Pulso::Data.new :name1, Object.new }.should raise_error Pulso::BlackBoardError
+    lambda { BlackBoard::Data.new }.should raise_error
+    lambda { BlackBoard::Data.new :name1, Object.new }.should raise_error BlackBoardError
     obj = TestObject.new
     data = nil
-    lambda { data = Pulso::Data.new :name1, obj }.should_not raise_error Pulso::BlackBoardError
+    lambda { data = BlackBoard::Data.new :name1, obj }.should_not raise_error BlackBoardError
     data.name.should == :name1
     data.data.should == obj
   end
 
   it "should have a timestamp" do
-    Pulso::Data.new(:name1, TestObject.new).timestamp.should be_close Time.now,1
+    BlackBoard::Data.new(:name1, TestObject.new).timestamp.should be_close Time.now,1
   end
 
 end
 
-describe Pulso::BlackBoard do
+describe BlackBoard do
 
   before :all do
     `memcached -d -p 11411 -P /tmp/memcached-test.pid`
-    @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+    @blackboard = BlackBoard.new :ttl => 2 do
       folder :folder1, [:name1, :name2]
     end
   end
@@ -95,8 +95,8 @@ describe Pulso::BlackBoard do
     end
 
     it "should complain if ttl is bigger than seconds in 30 days" do
-      lambda { Pulso::BlackBoard.new :ttl => 30*24*3600+1 }.should raise_error ArgumentError
-      lambda { Pulso::BlackBoard.new :ttl => 30*24*3600 }.should_not raise_error ArgumentError
+      lambda { BlackBoard.new :ttl => 30*24*3600+1 }.should raise_error ArgumentError
+      lambda { BlackBoard.new :ttl => 30*24*3600 }.should_not raise_error ArgumentError
     end
 
   end
@@ -106,7 +106,7 @@ describe Pulso::BlackBoard do
     it { @blackboard.should be_empty }
 
     it "should have folders after adding one" do
-      bb = Pulso::BlackBoard.new do
+      bb = BlackBoard.new do
         folder :folder1, [:name1, :name2]
       end
       bb.should have_folders
@@ -115,7 +115,7 @@ describe Pulso::BlackBoard do
 
     # TODO improve by regexp matching
     it "should complain when retrieving from inexistant folder" do
-      lambda { @blackboard.folder2.name1 }.should raise_error Pulso::BlackBoardError
+      lambda { @blackboard.folder2.name1 }.should raise_error BlackBoardError
     end
 
     it "should return nil when retrieving known data key from folder" do
@@ -123,7 +123,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should complain when retrieving unknown data key from folder" do
-      lambda { @blackboard.folder1.name5 }.should raise_error Pulso::BlackBoardError
+      lambda { @blackboard.folder1.name5 }.should raise_error BlackBoardError
     end
 
   end
@@ -131,7 +131,7 @@ describe Pulso::BlackBoard do
   describe "(non-empty)" do
     
     before :all do
-      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+      @blackboard = BlackBoard.new :ttl => 2 do
         folder :folder1, [:name1, :name2, :name3]
         folder :folder2, [:name4, :name5, :name6]
       end
@@ -233,7 +233,7 @@ describe Pulso::BlackBoard do
     it "should allow subfolders" do
 
       lambda { 
-        @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+        @blackboard = BlackBoard.new :ttl => 2 do
           folder :folder1, [:name1, :name2, :name3] do
             folder :folder2, [:name4, :name5]
           end
@@ -246,7 +246,7 @@ describe Pulso::BlackBoard do
 
     it "should be possible to write to a subfolder" do
 
-      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+      @blackboard = BlackBoard.new :ttl => 2 do
         folder :folder1, [:name1, :name2, :name3] do
           folder :folder2, [:name4, :name5]
         end
@@ -269,7 +269,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should allow different ttl for subfolders" do
-      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+      @blackboard = BlackBoard.new :ttl => 2 do
         folder :folder1, [:name1], :ttl => 1
         folder :folder2, [:name2], :ttl => 2
       end
@@ -288,7 +288,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should allow different ttl between folder and subfolder" do
-      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+      @blackboard = BlackBoard.new :ttl => 2 do
         folder :folder1, [:name1], :ttl => 1 do
           folder :folder2, [:name2], :ttl => 2
         end
@@ -309,7 +309,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should propagate tll to subfolders " do
-      @blackboard = Pulso::BlackBoard.new :ttl => 2 do
+      @blackboard = BlackBoard.new :ttl => 2 do
         folder :folder1, [:name1], :ttl => 1 do
           folder :folder2, [:name2]
         end
@@ -330,7 +330,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should support writing to two elements with same name on different folders" do
-      @blackboard = Pulso::BlackBoard.new :ttl => 10 do
+      @blackboard = BlackBoard.new :ttl => 10 do
         folder :folder1, [:name1]
         folder :folder2, [:name1]
       end
@@ -346,7 +346,7 @@ describe Pulso::BlackBoard do
     end
 
     it "should not complain when creating sub sub folders" do
-      lambda { @blackboard = Pulso::BlackBoard.new :ttl => 10 do
+      lambda { @blackboard = BlackBoard.new :ttl => 10 do
         folder :folder1, [:name1] do
           folder :folder1, [:name1] do
             folder :folder1, [:name1] do
