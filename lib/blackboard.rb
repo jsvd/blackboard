@@ -49,12 +49,9 @@ class BlackBoard
 
   class Folder < Hash
 
-    attr_reader :name, :ttl
-
     def initialize name, children, args = {}, &block
       @name = name
 
-      @items = {}
       @folders = []
       @ttl = args[:ttl]
       @cache = args[:cache]
@@ -91,6 +88,7 @@ class BlackBoard
     end
 
     def create_children children
+      @items = {}
       children.each do |child| 
         self[child] = nil
         instance_eval %Q{

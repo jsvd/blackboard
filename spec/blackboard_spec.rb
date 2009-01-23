@@ -23,7 +23,7 @@ describe BlackBoard::Folder do
     lambda { f = BlackBoard::Folder.new :folder1, [], :cache => @cache }.should raise_error ArgumentError
     lambda { f = BlackBoard::Folder.new :folder1, [], :ttl => 20 }.should raise_error ArgumentError
     lambda { f = BlackBoard::Folder.new :folder1, [], :cache => @cache, :ttl => 20 }.should_not raise_error ArgumentError
-    f.name.should == :folder1
+    f.instance_eval("@name").should == :folder1
   end
 
   it "should complain if ttl is bigger than seconds in 30 days" do
