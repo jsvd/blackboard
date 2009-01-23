@@ -15,9 +15,6 @@ spec = Gem::Specification.new do |s|
 	s.required_ruby_version = '>= 1.8.5'
 
   s.files = %w(
-    test
-    test/test_helper.rb
-    test/blackboard_test.rb
     lib
     lib/blackboard.rb
     README
