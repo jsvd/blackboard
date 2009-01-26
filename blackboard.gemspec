@@ -1,8 +1,8 @@
 spec = Gem::Specification.new do |s|
 	s.name              = "blackboard"
-	s.version           = "0.2.5"
+	s.version           = "0.2.6"
 	s.platform          = Gem::Platform::RUBY
-	s.has_rdoc          = false
+	s.has_rdoc          = true
 	s.summary           = ""
 	s.description       = ""
 	s.author            = "João Duarte"
@@ -17,7 +17,7 @@ spec = Gem::Specification.new do |s|
   s.files = %w(
     lib
     lib/blackboard.rb
-    README
+    README.rdoc
     spec
     spec/blackboard_spec.rb
     ChangeLog

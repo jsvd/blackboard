@@ -1,11 +1,19 @@
 
-= blackboard
+== BlackBoard
 
+* BlackBoard provides a folder-layer to memcache-client.
+* BlackBoard aims for quickly writing and reading of data.
+* To be attached to EventMachine, for example.
 
-== Description
+== Example
 
-BlackBoard provides a folder-layer to memcache-client. A BlackBoard is created with a static structure of folders and items.
+# Objects written to the blackboard must answer to :timestamp, for they will expire.
+class TestObject
+  attr_reader :timestamp
+  def initialize; @timestamp = Time.now; end
+end
 
+# A BlackBoard is created with a static structure of folders and items.
 bb = BlackBoard.new :ttl => 2 do
  folder :folder1, [:name1] do
    folder :folder1, [:name1, :name2]
@@ -13,26 +21,14 @@ bb = BlackBoard.new :ttl => 2 do
    folder :folder3, [:name2]
  end
 
-It is aimed at quickly writing and reading, usually attached to EventMachine, for example.
-Objects written to the blackboard must answer to :timestamp, for they will expire.
-
-class TestObject
-  attr_reader :timestamp
-  def initialize; @timestamp = Time.now; end
-end
-
+# To write an item from a folder:
 obj = TestObject.new
-
-To write an item from a folder:
-
 bb.folder1.folder1.name1 = obj
 
-To retrieve an item from a folder
-
+# To retrieve an item from a folder
 obj = bb.folder1.folder1.name1
 
-To retrive all items in a folder:
-
+# To retrive all items in a folder:
 items = bb.folder1
 obj = items[:folder1][:name1]
 
@@ -45,7 +41,6 @@ obj = items[:folder1][:name1]
 === Gem Installation
 
 	gem install blackboard
-
 
 == Features/Problems
 
