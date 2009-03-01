@@ -1,4 +1,5 @@
 require 'spec'
+require 'rubygems'
 require 'lib/blackboard'
 
 class TestObject
@@ -14,7 +15,7 @@ end
 describe BlackBoard::Folder do
 
   before :each do
-    @cache = MemCache.new("127.0.0.1:11411", :namespace => 'blackboard')
+    @cache = Moneta::Memcache.new  :server => "127.0.0.1:11411"
   end
 
   it "should be created with a name, servers and ttl" do

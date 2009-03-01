@@ -1,10 +1,8 @@
 # vim: expandtab : tabstop=2 : shiftwidth=2 : softtabstop=2
+require 'moneta'
 require 'moneta/memcache'
 
 class BlackBoard
-
-  require 'rubygems'
-  require 'memcache'
 
   @store = nil
 
