@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
 	s.name              = "blackboard"
-	s.version           = "0.2.6"
+	s.version           = "0.3.0"
 	s.platform          = Gem::Platform::RUBY
 	s.has_rdoc          = true
 	s.summary           = ""
@@ -11,7 +11,7 @@ spec = Gem::Specification.new do |s|
 	s.bindir            = "bin"
 	s.require_path      = "lib"
 
-	s.add_dependency('memcache-client', '>=1.4.0')
+	s.add_dependency('moneta', '>=0.5.0')
 	s.required_ruby_version = '>= 1.8.5'
 
   s.files = %w(

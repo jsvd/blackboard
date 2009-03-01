@@ -1,7 +1,7 @@
 
 == BlackBoard
 
-* BlackBoard provides a folder-layer to memcache-client.
+* BlackBoard provides a folder-layer to moneta.
 * BlackBoard aims for quickly writing and reading of data.
 * To be attached to EventMachine, for example.
 

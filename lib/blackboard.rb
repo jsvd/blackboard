@@ -1,11 +1,12 @@
 # vim: expandtab : tabstop=2 : shiftwidth=2 : softtabstop=2
+require 'moneta/memcache'
 
 class BlackBoard
 
   require 'rubygems'
   require 'memcache'
 
-  @cache = nil
+  @store = nil
 
   attr_reader :folders
 
@@ -13,14 +14,8 @@ class BlackBoard
     @folders = {}
     @ttl = opts[:ttl] || 60
     raise ArgumentError, "BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
-    @servers = opts[:servers]
-    @servers ||= "127.0.0.1:11411"
-    @cache = MemCache.new(@servers, :namespace => 'blackboard')
+    @store = opts[:store] || Moneta::Memcache.new(:server => "127.0.0.1:11411")
     instance_eval(&block) unless block.nil?
-  end
-
-  def active?
-    @cache.active?
   end
 
   def has_folders?
@@ -28,7 +23,7 @@ class BlackBoard
   end
 
   def empty? 
-    @cache.stats.inject(0) {|sum, server| sum + server.last["curr_items"]} == 0
+    true
   end
 
   def folder name, keys, args = {}, &block
@@ -36,11 +31,11 @@ class BlackBoard
     ttl = args[:ttl]
     ttl ||= @ttl
     instance_eval %Q{def #{name}; @folders[:#{name}]._update; @folders[:#{name}]; end}
-    @folders[name] = Folder.new name, keys, :cache => @cache, :ttl => ttl, &block
+    @folders[name] = Folder.new name, keys, :cache => @store, :ttl => ttl, &block
   end
 
-  def clean
-    @cache.flush_all
+  def clear
+    @store.clear
   end
 
   def method_missing folder
@@ -54,7 +49,7 @@ class BlackBoard
 
       @folders = []
       @ttl = args[:ttl]
-      @cache = args[:cache]
+      @store = args[:cache]
 
       raise ArgumentError, "Folder.new should receive name, keys, cache and ttl" if @ttl.nil? || args[:cache].nil?
       raise ArgumentError, "Folder.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
@@ -82,7 +77,7 @@ class BlackBoard
       ttl = args[:ttl]
       ttl ||= @ttl
       @folders << name
-      self[name] = Folder.new "#{@name}.#{name}", keys, :cache => @cache, :ttl => ttl, &block
+      self[name] = Folder.new "#{@name}.#{name}", keys, :cache => @store, :ttl => ttl, &block
       instance_eval %Q{def #{name}; self[:#{name}]._update ;self[:#{name}]; end}
 
     end
@@ -92,8 +87,14 @@ class BlackBoard
       children.each do |child| 
         self[child] = nil
         instance_eval %Q{
-        def #{child}=(object); add :#{child}, object; end
-        def #{child}; self[:#{child}] = get :#{child}; end}
+          def #{child}=(object)
+            add :#{child}, object
+          end
+
+          def #{child}
+            self[:#{child}] = get :#{child}
+          end
+        }
         @items[child] = Time.at 0 
       end
     end
@@ -105,12 +106,12 @@ class BlackBoard
 
       @items[name] = object.timestamp
       obj = Data.new(name, object)
-      @cache.set "#{@name}.#{name}", obj, obj_ttl
+      @store.store "#{@name}.#{name}", obj, :expires_in => obj_ttl
     end
 
     def get obj_name
       raise BlackBoardError, "Key #{obj_name} doesn't exist in folder #{@name}." unless @items.has_key?(obj_name)
-      ret = @cache["#{@name}.#{obj_name}"]
+      ret = @store["#{@name}.#{obj_name}"]
       return if ret.nil?
       ret.data
     end

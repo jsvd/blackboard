@@ -86,10 +86,6 @@ describe BlackBoard do
 
   describe "(default)" do 
 
-    it "should be active?" do
-      @blackboard.should be_active
-    end
-
     it "should have folders" do
       @blackboard.should have_folders
     end
@@ -164,7 +160,7 @@ describe BlackBoard do
     end
 
     it "should be empty after cleaning" do
-      @blackboard.clean
+      @blackboard.clear
       @blackboard.should be_empty
     end
 
@@ -224,7 +220,7 @@ describe BlackBoard do
     end
 
     after :each do
-      @blackboard.clean
+      @blackboard.clear
     end
   end
 
