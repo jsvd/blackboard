@@ -1,3 +1,0 @@
-[submodule "lib/moneta"]
-	path = lib/moneta
-	url = git://github.com/dchelimsky/rspec.git
