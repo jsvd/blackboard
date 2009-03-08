@@ -2,12 +2,12 @@
 == BlackBoard
 
 * BlackBoard provides a folder-layer to moneta.
-* BlackBoard aims for quickly writing and reading of data.
+* BlackBoard aims for quickly writing and reading data.
 * To be attached to EventMachine, for example.
 
 == Example
 
-# Objects written to the blackboard must answer to :timestamp, for they will expire.
+# Objects written to the blackboard must answer to :timestamp, since they'll expire.
 
   class TestObject
     attr_reader :timestamp
@@ -17,13 +17,14 @@
 # A BlackBoard is created with a static structure of folders and items.
 
   bb = BlackBoard.new :ttl => 2 do
-   folder :folder1, [:name1] do
-     folder :folder1, [:name1, :name2]
-     folder :folder2, [:name2]
-     folder :folder3, [:name2]
-   end
+    folder1 :name1 do
+      folder1 :name1, :name2
+      folder2 :name2
+      folder3 :name2, :ttl => 3
+    end
+  end
 
-# To write an item from a folder:
+# To write an item to a folder:
 
   obj = TestObject.new
   bb.folder1.folder1.name1 = obj
@@ -32,24 +33,21 @@
 
   obj = bb.folder1.folder1.name1
 
-# To retrive all items in a folder:
+# To retrieve all items in a folder:
 
   items = bb.folder1
   obj = items[:folder1][:name1]
 
 == Installation
 
-=== Archive Installation
-
-	rake install
-
 === Gem Installation
 
-	gem install blackboard
+	gem install jsvd-blackboard -s http://gems.github.com
 
 == Features/Problems
 
 * Broken #empty?
+* Unspecced Folder class since 0.4.0
 
 == Synopsis
 

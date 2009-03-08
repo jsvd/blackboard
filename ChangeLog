@@ -1,3 +1,7 @@
+== 0.4.0 / 2009-03-08
+
+* Simpler interface for item and folder structure construction
+
 == 0.3.1 / 2009-03-01
 
 * Fixed moneta dependency (wycats-moneta)

@@ -81,7 +81,7 @@ describe BlackBoard do
   before :all do
     `memcached -d -p 11411 -P /tmp/memcached-test.pid`
     @blackboard = BlackBoard.new :ttl => 2 do
-      folder :folder1, [:name1, :name2]
+      folder1 :name1, :name2
     end
   end
 
@@ -104,7 +104,7 @@ describe BlackBoard do
 
     it "should have folders after adding one" do
       bb = BlackBoard.new do
-        folder :folder1, [:name1, :name2]
+        folder1 :name1, :name2
       end
       bb.should have_folders
       bb.folders.keys.should include(:folder1)
@@ -129,8 +129,8 @@ describe BlackBoard do
     
     before :all do
       @blackboard = BlackBoard.new :ttl => 2 do
-        folder :folder1, [:name1, :name2, :name3]
-        folder :folder2, [:name4, :name5, :name6]
+        folder1 :name1, :name2, :name3
+        folder2 :name4, :name5, :name6
       end
       @blackboard.folders.keys.should include(:folder1)
     end
@@ -231,8 +231,8 @@ describe BlackBoard do
 
       lambda { 
         @blackboard = BlackBoard.new :ttl => 2 do
-          folder :folder1, [:name1, :name2, :name3] do
-            folder :folder2, [:name4, :name5]
+          folder1 :name1, :name2, :name3 do
+            folder2 :name4, :name5
           end
         end
       }.should_not raise_error
@@ -244,8 +244,8 @@ describe BlackBoard do
     it "should be possible to write to a subfolder" do
 
       @blackboard = BlackBoard.new :ttl => 2 do
-        folder :folder1, [:name1, :name2, :name3] do
-          folder :folder2, [:name4, :name5]
+        folder1 :name1, :name2, :name3 do
+          folder2 :name4, :name5
         end
       end
 
@@ -267,8 +267,8 @@ describe BlackBoard do
 
     it "should allow different ttl for subfolders" do
       @blackboard = BlackBoard.new :ttl => 2 do
-        folder :folder1, [:name1], :ttl => 1
-        folder :folder2, [:name2], :ttl => 2
+        folder1 :name1, :ttl => 1
+        folder2 :name2, :ttl => 2
       end
       obj = TestObject.new 
       obj.color = :green
@@ -286,8 +286,8 @@ describe BlackBoard do
 
     it "should allow different ttl between folder and subfolder" do
       @blackboard = BlackBoard.new :ttl => 2 do
-        folder :folder1, [:name1], :ttl => 1 do
-          folder :folder2, [:name2], :ttl => 2
+        folder1 :name1, :ttl => 1 do
+          folder2 :name2, :ttl => 2
         end
       end
       obj = TestObject.new 
@@ -307,8 +307,8 @@ describe BlackBoard do
 
     it "should propagate tll to subfolders " do
       @blackboard = BlackBoard.new :ttl => 2 do
-        folder :folder1, [:name1], :ttl => 1 do
-          folder :folder2, [:name2]
+        folder1 :name1, :ttl => 1 do
+          folder2 :name2
         end
       end
       obj = TestObject.new 
@@ -328,8 +328,8 @@ describe BlackBoard do
 
     it "should support writing to two elements with same name on different folders" do
       @blackboard = BlackBoard.new :ttl => 10 do
-        folder :folder1, [:name1]
-        folder :folder2, [:name1]
+        folder1 :name1
+        folder2 :name1
       end
       obj = TestObject.new 
       obj.color = :green
@@ -344,12 +344,12 @@ describe BlackBoard do
 
     it "should not complain when creating sub sub folders" do
       lambda { @blackboard = BlackBoard.new :ttl => 10 do
-        folder :folder1, [:name1] do
-          folder :folder1, [:name1] do
-            folder :folder1, [:name1] do
-              folder :folder1, [:name1] do
-                folder :folder1, [:name1] do
-                  folder :folder1, [:name1]
+        folder1 :name1 do
+          folder1 :name1 do
+            folder1 :name1 do
+              folder1 :name1 do
+                folder1 :name1 do
+                  folder1 :name1
                 end
               end
             end

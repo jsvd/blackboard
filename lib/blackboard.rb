@@ -14,6 +14,7 @@ class BlackBoard
     raise ArgumentError, "BlackBoard.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
     @store = opts[:store] || Moneta::Memcache.new(:server => "127.0.0.1:11411")
     instance_eval(&block) unless block.nil?
+    instance_eval "def method_missing folder; raise BlackBoardError, \"Folder \#{folder} not found\"; end"
   end
 
   def has_folders?
@@ -24,60 +25,58 @@ class BlackBoard
     true
   end
 
-  def folder name, keys, args = {}, &block
-    raise BlackBoardError, "Folder #{name} already exists" if @folders.has_key?(name)
-    ttl = args[:ttl]
-    ttl ||= @ttl
-    instance_eval %Q{def #{name}; @folders[:#{name}]._update; @folders[:#{name}]; end}
-    @folders[name] = Folder.new name, keys, :cache => @store, :ttl => ttl, &block
-  end
-
   def clear
     @store.clear
   end
 
-  def method_missing folder
-    raise BlackBoardError, "Folder #{folder} not found"
+  def method_missing name, *args, &block
+
+    raise BlackBoardError, "Folder #{name} already exists" if @folders.has_key?(name)
+    instance_eval %Q{def #{name}; @folders[:#{name}]._update; @folders[:#{name}]; end}
+
+    options = args[-1].is_a?(Hash) ? args.delete_at(-1) : {}
+    options[:ttl] ||= @ttl
+    options[:store] ||= @store
+
+    @folders[name] = Folder.new name, args, options, &block
+
   end
 
   class Folder < Hash
 
-    def initialize name, children, args = {}, &block
+    def initialize name, items, options, &block
       @name = name
 
       @folders = []
-      @ttl = args[:ttl]
-      @store = args[:cache]
+      @ttl = options[:ttl]
+      @store = options[:store]
 
-      raise ArgumentError, "Folder.new should receive name, keys, cache and ttl" if @ttl.nil? || args[:cache].nil?
       raise ArgumentError, "Folder.new should not receive ttl bigger than #seconds in 30 days" if @ttl > 2592000
 
-      create_children children
+      create_children items 
 
       instance_eval(&block) unless block.nil?
-
+      instance_eval "def method_missing folder; raise BlackBoardError, \"Folder \#{folder} not found\"; end"
     end
 
-    def method_missing folder
-      raise BlackBoardError, "Folder #{folder} not found"
+    def method_missing name, *args, &block
+
+      raise BlackBoardError, "Folder #{name} already exists" if @folders.include?(name)
+      instance_eval %Q{def #{name}; self[:#{name}]._update; self[:#{name}]; end}
+
+      options = args[-1].is_a?(Hash) ? args.delete_at(-1) : {}
+      options[:ttl] ||= @ttl
+      options[:store] ||= @store
+
+      self[name] = Folder.new "#{@name}.#{name}", args, options, &block
+
     end
 
     def _update
       @items.keys.each do |k|
         self[k] = get k
       end
-      @folders.each {|f| self[f]._update }
-    end
-
-    private
-    def folder name, keys, args = {}, &block
-      raise BlackBoardError, "Folder #{name} already exists" if self.has_key?(name)
-      ttl = args[:ttl]
-      ttl ||= @ttl
-      @folders << name
-      self[name] = Folder.new "#{@name}.#{name}", keys, :cache => @store, :ttl => ttl, &block
-      instance_eval %Q{def #{name}; self[:#{name}]._update ;self[:#{name}]; end}
-
+      @folders.each {|f| ; self[f]._update }
     end
 
     def create_children children
